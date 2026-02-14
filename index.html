@@ -1,0 +1,1261 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Japonia 2026 — Plan Podróży</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=DM+Sans:wght@400;500;700&family=Noto+Sans+JP:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root {
+    --ink: #1a1a2e;
+    --paper: #faf8f5;
+    --red: #c0392b;
+    --gold: #d4a843;
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+body { font-family:'DM Sans',sans-serif; background:var(--paper); color:var(--ink); line-height:1.6; }
+
+/* HERO */
+.hero {
+    background: linear-gradient(135deg, #1a1a2e 0%, #2d1b4e 50%, #c0392b 100%);
+    color:white; text-align:center; padding:80px 20px 60px;
+    position:relative; overflow:hidden;
+}
+.hero::before {
+    content:'日本の旅 2026'; position:absolute; top:50%; left:50%; transform:translate(-50%,-50%);
+    font-family:'Noto Sans JP'; font-size:clamp(60px,12vw,140px); opacity:0.06; white-space:nowrap;
+    pointer-events:none;
+}
+.hero h1 { font-family:'Playfair Display'; font-size:clamp(36px,6vw,64px); font-weight:900; margin-bottom:8px; }
+.hero p { font-size:18px; opacity:0.85; max-width:600px; margin:0 auto; }
+.hero .dates { font-size:14px; opacity:0.6; margin-top:12px; letter-spacing:2px; text-transform:uppercase; }
+
+/* NAV */
+.sticky-nav {
+    position:sticky; top:0; z-index:100; background:rgba(250,248,245,0.95);
+    backdrop-filter:blur(10px); border-bottom:1px solid rgba(0,0,0,0.08);
+    display:flex; gap:4px; padding:10px 16px; overflow-x:auto;
+    justify-content:center; flex-wrap:wrap;
+}
+.nav-day {
+    padding:6px 14px; border-radius:20px; text-decoration:none;
+    font-size:13px; font-weight:700; color:var(--ink); background:#eee;
+    transition:all 0.2s;
+}
+.nav-day:hover { transform:scale(1.1); }
+.nav-day[data-region="osaka"] { background:#e8f0fe; color:#1a4b8c; }
+.nav-day[data-region="kyoto"] { background:#fff3e8; color:#c45200; }
+.nav-day[data-region="hiroshima"] { background:#e8f8ef; color:#1a6b3c; }
+.nav-day[data-region="onomichi"] { background:#f3e8ff; color:#6c3082; }
+.nav-day[data-region="tokyo"] { background:#fde8e8; color:#c0392b; }
+.nav-day[data-region="travel"] { background:#f0f0f0; color:#555; }
+
+/* HOTELS */
+.hotels-section { max-width:1000px; margin:30px auto; padding:0 20px; }
+.hotels-section h3 { font-family:'Playfair Display'; font-size:24px; margin-bottom:16px; }
+.hotels-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:12px; }
+.hotel-card { background:white; padding:16px; border-radius:10px; box-shadow:0 2px 8px rgba(0,0,0,0.06); }
+.hotel-card h4 { font-size:14px; margin-bottom:4px; }
+.hotel-card p { font-size:13px; color:#666; }
+
+/* DAY SECTIONS */
+.day-section { max-width:1000px; margin:24px auto; border-radius:16px; overflow:hidden; box-shadow:0 4px 20px rgba(0,0,0,0.08); background:white; }
+.day-header {
+    color:white; padding:24px 28px; display:flex; align-items:center; gap:20px;
+}
+.day-number {
+    font-family:'Playfair Display'; font-size:36px; font-weight:900;
+    background:rgba(255,255,255,0.2); width:64px; height:64px; border-radius:50%;
+    display:flex; align-items:center; justify-content:center; flex-shrink:0;
+}
+.day-date { font-size:13px; opacity:0.8; letter-spacing:1px; }
+.day-info h2 { font-family:'Playfair Display'; font-size:22px; font-weight:700; }
+.region-badge {
+    display:inline-block; background:rgba(255,255,255,0.2); padding:3px 12px;
+    border-radius:12px; font-size:12px; font-weight:700; margin-top:4px;
+}
+.day-content { padding:20px; }
+
+/* ACTIVITY CARDS */
+.activity-card {
+    display:flex; gap:16px; padding:16px; margin-bottom:12px;
+    border-radius:12px; background:#fafafa; border:1px solid #eee;
+    transition:transform 0.2s, box-shadow 0.2s;
+}
+.activity-card:hover { transform:translateY(-2px); box-shadow:0 4px 16px rgba(0,0,0,0.08); }
+.activity-thumb {
+    flex-shrink:0; width:120px; height:85px; border-radius:8px; overflow:hidden;
+    display:block;
+}
+.activity-thumb img {
+    width:100%; height:100%; object-fit:cover;
+    transition:transform 0.3s;
+}
+.activity-thumb:hover img { transform:scale(1.1); }
+.activity-content { flex:1; min-width:0; }
+.activity-header { display:flex; align-items:center; gap:8px; flex-wrap:wrap; margin-bottom:6px; }
+.activity-header h4 { font-size:15px; font-weight:700; }
+.time-badge {
+    color:white; padding:2px 10px; border-radius:10px; font-size:11px;
+    font-weight:700; white-space:nowrap;
+}
+.dur-badge {
+    background:#f0f0f0; color:#555; padding:2px 8px; border-radius:8px;
+    font-size:11px; font-weight:600; white-space:nowrap;
+}
+.activity-content > p { font-size:13px; color:#444; margin-bottom:6px; }
+.cost-tag {
+    display:inline-block; background:#fff3e8; color:#c45200;
+    padding:2px 8px; border-radius:6px; font-size:11px; font-weight:600;
+}
+.tip {
+    margin-top:6px; font-size:12px; color:#1a6b3c; background:#e8f8ef;
+    padding:6px 10px; border-radius:8px; border-left:3px solid #27ae60;
+}
+
+/* SPLIT PLANS */
+.split-plans { display:grid; grid-template-columns:1fr 1fr; gap:16px; }
+.plan-block { padding:16px; border-radius:12px; }
+.plan-a { background:linear-gradient(135deg, #fef9e7 0%, #fdebd0 100%); border:2px solid #f0c27f; }
+.plan-b { background:linear-gradient(135deg, #eaf2f8 0%, #d6eaf8 100%); border:2px solid #85c1e9; }
+.plan-title { font-family:'Playfair Display'; font-size:18px; margin-bottom:12px; text-align:center; }
+.plan-block .activity-card { background:rgba(255,255,255,0.7); }
+
+/* PRINT */
+@media print {
+    .sticky-nav { display:none; }
+    .day-section { break-inside:avoid; box-shadow:none; border:1px solid #ccc; }
+    .activity-thumb { width:80px; height:56px; }
+}
+
+/* MOBILE */
+@media (max-width:768px) {
+    .split-plans { grid-template-columns:1fr; }
+    .activity-card { flex-direction:column; }
+    .activity-thumb { width:100%; height:160px; }
+    .day-header { padding:16px; }
+    .day-number { width:48px; height:48px; font-size:24px; }
+}
+</style>
+</head>
+<body>
+<div class="hero">
+    <h1>🇯🇵 Japonia 2026</h1>
+    <p>Osaka · Kyoto · Hiroshima · Onomichi · Tokyo</p>
+    <div class="dates">18 — 30 KWIETNIA · 13 DNI · 12 NOCY</div>
+</div>
+
+<nav class="sticky-nav"><a href="#day1" class="nav-day" data-region="osaka">D1</a><a href="#day2" class="nav-day" data-region="osaka">D2</a><a href="#day3" class="nav-day" data-region="kyoto">D3</a><a href="#day4" class="nav-day" data-region="kyoto">D4</a><a href="#day5" class="nav-day" data-region="hiroshima">D5</a><a href="#day6" class="nav-day" data-region="hiroshima">D6</a><a href="#day7" class="nav-day" data-region="onomichi">D7</a><a href="#day8" class="nav-day" data-region="travel">D8</a><a href="#day9" class="nav-day" data-region="tokyo">D9</a><a href="#day10" class="nav-day" data-region="tokyo">D10</a><a href="#day11" class="nav-day" data-region="tokyo">D11</a><a href="#day12" class="nav-day" data-region="tokyo">D12</a><a href="#day13" class="nav-day" data-region="travel">D13</a></nav>
+
+<div class="hotels-section">
+    <h3>🏨 Noclegi (12 nocy)</h3>
+    
+    <div class="hotels-grid">
+        <div class="hotel-card" style="border-left:4px solid #2d7dd2">
+            <h4>🏨 Green Villa Kurosaki</h4>
+            <p><strong>Osaka</strong> · 4 noce · 18-22 kwi</p>
+        </div>
+        <div class="hotel-card" style="border-left:4px solid #27ae60">
+            <h4>🏨 Toyoko Inn Hiroshima</h4>
+            <p><strong>Hiroshima</strong> · 2 noce · 22-24 kwi</p>
+        </div>
+        <div class="hotel-card" style="border-left:4px solid #8e44ad">
+            <h4>🏨 Senkouji Sakano Rian Fuu</h4>
+            <p><strong>Onomichi</strong> · 1 noc · 24-25 kwi</p>
+        </div>
+        <div class="hotel-card" style="border-left:4px solid #e74c3c">
+            <h4>🏨 Sasatsuka Fleur Tachibana</h4>
+            <p><strong>Tokyo</strong> · 5 nocy · 25-30 kwi</p>
+        </div>
+    </div>
+</div>
+
+
+        <section id="day1" class="day-section">
+            <div class="day-header" style="background:#1a4b8c">
+                <div class="day-number">D1</div>
+                <div class="day-info">
+                    <span class="day-date">18 kwi (pt)</span>
+                    <h2>Przylot do Osaki</h2>
+                    <span class="region-badge">Osaka</span>
+                </div>
+            </div>
+            <div class="day-content">
+                <div class="activity-card">
+        
+        <div class="activity-content">
+            <div class="activity-header">
+                <span class="time-badge" style="background:#2d7dd2">18:00</span>
+                <span class="dur-badge">1.5h</span>
+                <h4>Lądowanie na Kansai International Airport</h4>
+            </div>
+            <p>Odbiór bagażu, zakup karty IC (ICOCA/Suica), przejazd do Osaki (~75 min pociągiem Nankai/JR)</p>
+            <div class="activity-meta"><span class="cost-tag">~1,200 JPY transport</span></div>
+        </div>
+    </div><div class="activity-card">
+        
+        <div class="activity-content">
+            <div class="activity-header">
+                <span class="time-badge" style="background:#2d7dd2">19:30</span>
+                <span class="dur-badge">30 min</span>
+                <h4>Check-in: Green Villa Kurosaki</h4>
+            </div>
+            <p>4 noce (18-22 kwi). Zostawienie bagażu i rozgoszczenie się.</p>
+            <div class="activity-meta"></div>
+        </div>
+    </div><div class="activity-card">
+        <a href="https://lh3.googleusercontent.com/place-photos/AL8-SNEU1-ej1o4K_z55bNboix9cyMWXNSEozY5Vs8fyCnXV38oKM_2uQIDQz7uSDSL4kqVEt1Y6cO_7SucDyl4TmlNeFmfRBfuzXek1ST62UJGTV46WN2Sv4BlJbnIzVvp9mTZ7AXg78Xr0G8tFcA=s4800-w800-h600" target="_blank" class="activity-thumb" title="Kliknij aby zobaczyć pełne zdjęcie">
+            <img src="https://lh3.googleusercontent.com/place-photos/AL8-SNEU1-ej1o4K_z55bNboix9cyMWXNSEozY5Vs8fyCnXV38oKM_2uQIDQz7uSDSL4kqVEt1Y6cO_7SucDyl4TmlNeFmfRBfuzXek1ST62UJGTV46WN2Sv4BlJbnIzVvp9mTZ7AXg78Xr0G8tFcA=s400-w200-h140" alt="Dotonbori — Street Food Walk" loading="lazy"/>
+        </a>
+        <div class="activity-content">
+            <div class="activity-header">
+                <span class="time-badge" style="background:#2d7dd2">20:30</span>
+                <span class="dur-badge">2h</span>
+                <h4>Dotonbori — Street Food Walk</h4>
+            </div>
+            <p>Neony, tłumy, jedzenie uliczne. Spróbuj takoyaki (ośmiornicowe kulki) i kushikatsu (smażone szaszłyki). Słynny krab i biegacz Glico Man.</p>
+            <div class="activity-meta"><span class="cost-tag">~2,000 JPY na jedzenie</span><div class="tip">💡 Takoyaki od Takoyaki Wanaka — jedne z najlepszych!</div></div>
+        </div>
+    </div>
+            </div>
+        </section>
+        <section id="day2" class="day-section">
+            <div class="day-header" style="background:#1a4b8c">
+                <div class="day-number">D2</div>
+                <div class="day-info">
+                    <span class="day-date">19 kwi (sob)</span>
+                    <h2>Osaka — Pełny Dzień</h2>
+                    <span class="region-badge">Osaka</span>
+                </div>
+            </div>
+            <div class="day-content">
+                <div class="activity-card">
+        <a href="https://lh3.googleusercontent.com/place-photos/AL8-SNHPgEMxQgoyD9sGQK50vFqwRspWFt5Edx3MN1mzRsZvRJAFRhpYVlwV7hm-r_fSiboYv59HCGhJN54Ehr-Iy__2NUMEeVuwIXsI58zUQatDuQZL1s82_i-nedZPK031fHiOQaylTUpf2pcbug=s4800-w800-h600" target="_blank" class="activity-thumb" title="Kliknij aby zobaczyć pełne zdjęcie">
+            <img src="https://lh3.googleusercontent.com/place-photos/AL8-SNHPgEMxQgoyD9sGQK50vFqwRspWFt5Edx3MN1mzRsZvRJAFRhpYVlwV7hm-r_fSiboYv59HCGhJN54Ehr-Iy__2NUMEeVuwIXsI58zUQatDuQZL1s82_i-nedZPK031fHiOQaylTUpf2pcbug=s400-w200-h140" alt="Super Nintendo World / USJ" loading="lazy"/>
+        </a>
+        <div class="activity-content">
+            <div class="activity-header">
+                <span class="time-badge" style="background:#2d7dd2">09:00</span>
+                <span class="dur-badge">4-5h</span>
+                <h4>Super Nintendo World / USJ</h4>
+            </div>
+            <p>Mario Kart: Koopa's Challenge, Donkey Kong Mine Cart Madness. Interaktywne gry z Power-Up Band.</p>
+            <div class="activity-meta"><span class="cost-tag">~200 PLN bilet</span><div class="tip">💡 Kup bilety online z wyprzedzeniem! Wejście wcześnie rano = najkrótsze kolejki.</div></div>
+        </div>
+    </div><div class="activity-card">
+        
+        <div class="activity-content">
+            <div class="activity-header">
+                <span class="time-badge" style="background:#2d7dd2">14:00</span>
+                <span class="dur-badge">1h</span>
+                <h4>Lunch: Fuku Taro Okonomiyaki</h4>
+            </div>
+            <p>Osaka-style okonomiyaki — naleśnik z kapustą, mięsem i sosami. Klasyka regionalna.</p>
+            <div class="activity-meta"><span class="cost-tag">~1,500 JPY</span></div>
+        </div>
+    </div><div class="activity-card">
+        <a href="https://lh3.googleusercontent.com/place-photos/AL8-SNHdyzBnndwWDbBlAz8j732juZlmi0o84_QLCsxXwl1dqskWII48m06S2Js30SMMdAOutkdlrLRRZFi6Kb-g5KlYxooAhXOUiRZ9unb6v6W-SwipLwCVZ7LA57QU1uiUBNCexTwIthrQuXIldw=s4800-w800-h600" target="_blank" class="activity-thumb" title="Kliknij aby zobaczyć pełne zdjęcie">
+            <img src="https://lh3.googleusercontent.com/place-photos/AL8-SNHdyzBnndwWDbBlAz8j732juZlmi0o84_QLCsxXwl1dqskWII48m06S2Js30SMMdAOutkdlrLRRZFi6Kb-g5KlYxooAhXOUiRZ9unb6v6W-SwipLwCVZ7LA57QU1uiUBNCexTwIthrQuXIldw=s400-w200-h140" alt="Zamek Osaka (zewnątrz)" loading="lazy"/>
+        </a>
+        <div class="activity-content">
+            <div class="activity-header">
+                <span class="time-badge" style="background:#2d7dd2">15:30</span>
+                <span class="dur-badge">1h</span>
+                <h4>Zamek Osaka (zewnątrz)</h4>
+            </div>
+            <p>Ikoniczny zamek z XVI wieku otoczony fosą i parkiem. Wspaniałe zdjęcia z zewnątrz — wieża zamkowa w otoczeniu zieleni.</p>
+            <div class="activity-meta"><span class="cost-tag">Darmowe (park)</span><div class="tip">💡 Zamek wygląda najpiękniej z mostu przy fosie.</div></div>
+        </div>
+    </div><div class="activity-card">
+        <a href="https://lh3.googleusercontent.com/place-photos/AL8-SNFeqEY3aqQAHZPRfo1pJDHV75gerggYnaCiwmlql6VxdaetT7YeV3Rtf7pHlihKL9nnOFA3P2BVkmDBwOEcSg6QIt_82TtdP7fZIFo9VBaAeKkigERZZdqrNHJqqnWyomw0jL_bzMQS1YDvffs=s4800-w800-h600" target="_blank" class="activity-thumb" title="Kliknij aby zobaczyć pełne zdjęcie">
+            <img src="https://lh3.googleusercontent.com/place-photos/AL8-SNFeqEY3aqQAHZPRfo1pJDHV75gerggYnaCiwmlql6VxdaetT7YeV3Rtf7pHlihKL9nnOFA3P2BVkmDBwOEcSg6QIt_82TtdP7fZIFo9VBaAeKkigERZZdqrNHJqqnWyomw0jL_bzMQS1YDvffs=s400-w200-h140" alt="Namba Yasaka Shrine" loading="lazy"/>
+        </a>
+        <div class="activity-content">
+            <div class="activity-header">
+                <span class="time-badge" style="background:#2d7dd2">16:30</span>
+                <span class="dur-badge">30 min</span>
+                <h4>Namba Yasaka Shrine</h4>
+            </div>
+            <p>Świątynia z gigantyczną głową lwa (eno-den) — jedno z najbardziej fotogenicznych miejsc w Osace. Lew "połyka" złe duchy.</p>
+            <div class="activity-meta"><span class="cost-tag">Darmowe</span></div>
+        </div>
+    </div><div class="activity-card">
+        
+        <div class="activity-content">
+            <div class="activity-header">
+                <span class="time-badge" style="background:#2d7dd2">17:15</span>
+                <span class="dur-badge">30 min</span>
+                <h4>Donguri Kyowakoku (Ghibli Shop)</h4>
+            </div>
+            <p>Sklep ze Studio Ghibli — Totoro, Spirited Away, Princess Mononoke. Idealne pamiątki.</p>
+            <div class="activity-meta"><span class="cost-tag">Wg zakupów</span></div>
+        </div>
+    </div><div class="activity-card">
+        <a href="https://lh3.googleusercontent.com/places/ANXAkqFF8VCTd3k9obuNdQiGNEbb6U5cJW8ks0DTNEt_bf9cEAJhc6JnDoK3lEjagekOFSIQBI7p4e0FEWMP5rgYVq0N8kDqQdHF9O0=s4800-w800-h600" target="_blank" class="activity-thumb" title="Kliknij aby zobaczyć pełne zdjęcie">
+            <img src="https://lh3.googleusercontent.com/places/ANXAkqFF8VCTd3k9obuNdQiGNEbb6U5cJW8ks0DTNEt_bf9cEAJhc6JnDoK3lEjagekOFSIQBI7p4e0FEWMP5rgYVq0N8kDqQdHF9O0=s400-w200-h140" alt="teamLab Botanical Garden Osaka" loading="lazy"/>
+        </a>
+        <div class="activity-content">
+            <div class="activity-header">
+                <span class="time-badge" style="background:#2d7dd2">20:00</span>
+                <span class="dur-badge">1.5-2h</span>
+                <h4>teamLab Botanical Garden Osaka</h4>
+            </div>
+            <p>Nocna instalacja świetlna w ogrodzie botanicznym. Interaktywne ścieżki reagujące na ruch. Magiczna atmosfera.</p>
+            <div class="activity-meta"><span class="cost-tag">~50 PLN</span><div class="tip">💡 Tylko wieczorem! Przyjdź po 19:00 dla najlepszego efektu.</div></div>
+        </div>
+    </div>
+            </div>
+        </section>
+        <section id="day3" class="day-section">
+            <div class="day-header" style="background:#c45200">
+                <div class="day-number">D3</div>
+                <div class="day-info">
+                    <span class="day-date">20 kwi (ndz)</span>
+                    <h2>Kyoto — Day Trip 1</h2>
+                    <span class="region-badge">Kyoto</span>
+                </div>
+            </div>
+            <div class="day-content">
+                <div class="activity-card">
+        
+        <div class="activity-content">
+            <div class="activity-header">
+                <span class="time-badge" style="background:#e67e22">08:00</span>
+                <span class="dur-badge">45 min</span>
+                <h4>Pociąg Osaka → Kyoto</h4>
+            </div>
+            <p>JR Special Rapid z Osaka Station (~30 min, 570 JPY) lub Hankyu Line.</p>
+            <div class="activity-meta"><span class="cost-tag">~570 JPY</span></div>
+        </div>
+    </div><div class="activity-card">
+        <a href="https://lh3.googleusercontent.com/place-photos/AL8-SNG90s6uLuDuM2HKuWJ-rr1QDSzbeLM0SuV8knjGdTbnK6ajO8Wo4Od6jnq5hnU1U55KdOjfeO6lqYJH7ZxQ8oiwdK3QwDc_jwsZAH4ARzh5-BAJ6pWNLtXt4fXoBdb-KU0N0uRGCM_LLWVYew=s4800-w800-h600" target="_blank" class="activity-thumb" title="Kliknij aby zobaczyć pełne zdjęcie">
+            <img src="https://lh3.googleusercontent.com/place-photos/AL8-SNG90s6uLuDuM2HKuWJ-rr1QDSzbeLM0SuV8knjGdTbnK6ajO8Wo4Od6jnq5hnU1U55KdOjfeO6lqYJH7ZxQ8oiwdK3QwDc_jwsZAH4ARzh5-BAJ6pWNLtXt4fXoBdb-KU0N0uRGCM_LLWVYew=s400-w200-h140" alt="Fushimi Inari Taisha ⛩️" loading="lazy"/>
+        </a>
+        <div class="activity-content">
+            <div class="activity-header">
+                <span class="time-badge" style="background:#e67e22">09:00</span>
+                <span class="dur-badge">2h</span>
+                <h4>Fushimi Inari Taisha ⛩️</h4>
+            </div>
+            <p>Tysiące czerwonych torii gates wzdłuż szlaku na górę Inari. Najsłynniejsza świątynia Kyoto. Darmowe wejście 24/7.</p>
+            <div class="activity-meta"><span class="cost-tag">Darmowe</span><div class="tip">💡 Przyjdź PRZED 9:00 rano! O 10:00 jest już tłoczno. Pełen szlak = 2-3h.</div></div>
+        </div>
+    </div><div class="activity-card">
+        <a href="https://lh3.googleusercontent.com/place-photos/AL8-SNEU1-ej1o4K_z55bNboix9cyMWXNSEozY5Vs8fyCnXV38oKM_2uQIDQz7uSDSL4kqVEt1Y6cO_7SucDyl4TmlNeFmfRBfuzXek1ST62UJGTV46WN2Sv4BlJbnIzVvp9mTZ7AXg78Xr0G8tFcA=s4800-w800-h600" target="_blank" class="activity-thumb" title="Kliknij aby zobaczyć pełne zdjęcie">
+            <img src="https://lh3.googleusercontent.com/place-photos/AL8-SNEU1-ej1o4K_z55bNboix9cyMWXNSEozY5Vs8fyCnXV38oKM_2uQIDQz7uSDSL4kqVEt1Y6cO_7SucDyl4TmlNeFmfRBfuzXek1ST62UJGTV46WN2Sv4BlJbnIzVvp9mTZ7AXg78Xr0G8tFcA=s400-w200-h140" alt="Dzielnica Gion — lunch i spacer" loading="lazy"/>
+        </a>
+        <div class="activity-content">
+            <div class="activity-header">
+                <span class="time-badge" style="background:#e67e22">11:30</span>
+                <span class="dur-badge">1.5h</span>
+                <h4>Dzielnica Gion — lunch i spacer</h4>
+            </div>
+            <p>Historyczna dzielnica gejsz z drewnianymi machiya. Hanami-koji Street to główna ulica. Szansa na zobaczenie maiko (uczennic gejsz).</p>
+            <div class="activity-meta"><span class="cost-tag">~1,500 JPY lunch</span><div class="tip">💡 Nie fotografuj gejsz/maiko z bliska — to niegrzeczne!</div></div>
+        </div>
+    </div><div class="activity-card">
+        <a href="https://lh3.googleusercontent.com/place-photos/AL8-SNFeqEY3aqQAHZPRfo1pJDHV75gerggYnaCiwmlql6VxdaetT7YeV3Rtf7pHlihKL9nnOFA3P2BVkmDBwOEcSg6QIt_82TtdP7fZIFo9VBaAeKkigERZZdqrNHJqqnWyomw0jL_bzMQS1YDvffs=s4800-w800-h600" target="_blank" class="activity-thumb" title="Kliknij aby zobaczyć pełne zdjęcie">
+            <img src="https://lh3.googleusercontent.com/place-photos/AL8-SNFeqEY3aqQAHZPRfo1pJDHV75gerggYnaCiwmlql6VxdaetT7YeV3Rtf7pHlihKL9nnOFA3P2BVkmDBwOEcSg6QIt_82TtdP7fZIFo9VBaAeKkigERZZdqrNHJqqnWyomw0jL_bzMQS1YDvffs=s400-w200-h140" alt="Yasaka Jinja Shrine" loading="lazy"/>
+        </a>
+        <div class="activity-content">
+            <div class="activity-header">
+                <span class="time-badge" style="background:#e67e22">13:00</span>
+                <span class="dur-badge">45 min</span>
+                <h4>Yasaka Jinja Shrine</h4>
+            </div>
+            <p>Główna świątynia Gion przy wejściu do dzielnicy. Piękne czerwone latarnie, szczególnie wieczorem. Powiązana z festiwalem Gion Matsuri.</p>
+            <div class="activity-meta"><span class="cost-tag">Darmowe</span></div>
+        </div>
+    </div><div class="activity-card">
+        <a href="https://lh3.googleusercontent.com/place-photos/AL8-SNFVhQ8vAgE-pPI0OQTPfdEtI5r2W9zl6vkoDy_AE7RVL27oJRUZ6L3bNyaI6D-hdvkQFifdXrBmAPRJ4WfecyVKoxNw4nyhmENPxQhqOI500GFWIiD6IM82tBxUGWDbG5SN50UyArPdwqHyzg=s4800-w800-h600" target="_blank" class="activity-thumb" title="Kliknij aby zobaczyć pełne zdjęcie">
+            <img src="https://lh3.googleusercontent.com/place-photos/AL8-SNFVhQ8vAgE-pPI0OQTPfdEtI5r2W9zl6vkoDy_AE7RVL27oJRUZ6L3bNyaI6D-hdvkQFifdXrBmAPRJ4WfecyVKoxNw4nyhmENPxQhqOI500GFWIiD6IM82tBxUGWDbG5SN50UyArPdwqHyzg=s400-w200-h140" alt="Zamek Nijō 🏯 (UNESCO)" loading="lazy"/>
+        </a>
+        <div class="activity-content">
+            <div class="activity-header">
+                <span class="time-badge" style="background:#e67e22">14:00</span>
+                <span class="dur-badge">1.5h</span>
+                <h4>Zamek Nijō 🏯 (UNESCO)</h4>
+            </div>
+            <p>XVII-wieczny zamek shogunatu Tokugawa. Słynne "słowicze podłogi" (nightingale floors) skrzypiące pod stopami. Piękne ogrody.</p>
+            <div class="activity-meta"><span class="cost-tag">~1,300 JPY</span><div class="tip">💡 Ninomaru Palace zamyka się o 16:00 — nie spóźnij się!</div></div>
+        </div>
+    </div><div class="activity-card">
+        
+        <div class="activity-content">
+            <div class="activity-header">
+                <span class="time-badge" style="background:#e67e22">16:00</span>
+                <span class="dur-badge">1h</span>
+                <h4>Opcjonalnie: Evangelion Kyoto Base</h4>
+            </div>
+            <p>Muzeum Evangelion dla fanów anime. Interaktywne wystawy i ekskluzywny merch.</p>
+            <div class="activity-meta"><span class="cost-tag">~2,500 JPY</span><div class="tip">💡 Tylko dla fanów Evangelion.</div></div>
+        </div>
+    </div><div class="activity-card">
+        
+        <div class="activity-content">
+            <div class="activity-header">
+                <span class="time-badge" style="background:#e67e22">17:00</span>
+                <span class="dur-badge">45 min</span>
+                <h4>Powrót do Osaki</h4>
+            </div>
+            <p>Pociąg JR z Kyoto Station.</p>
+            <div class="activity-meta"><span class="cost-tag">~570 JPY</span></div>
+        </div>
+    </div><div class="activity-card">
+        <a href="https://lh3.googleusercontent.com/place-photos/AL8-SNG-FCtLySTLzlNICJaaShlzpaMLYl8J62BkAE8JMD3iIcs5fJk2dlgBFrCBcBfr3wT3Zdg0e-g-YCL4NhwgtbWFgClHFs4cgcjoCoWXq8m_miBorbWJcy5sZCmQU3HrJBXa8gM-N_HQgzmljg=s4800-w800-h600" target="_blank" class="activity-thumb" title="Kliknij aby zobaczyć pełne zdjęcie">
+            <img src="https://lh3.googleusercontent.com/place-photos/AL8-SNG-FCtLySTLzlNICJaaShlzpaMLYl8J62BkAE8JMD3iIcs5fJk2dlgBFrCBcBfr3wT3Zdg0e-g-YCL4NhwgtbWFgClHFs4cgcjoCoWXq8m_miBorbWJcy5sZCmQU3HrJBXa8gM-N_HQgzmljg=s400-w200-h140" alt="Umeda Sky Building — zachód słońca" loading="lazy"/>
+        </a>
+        <div class="activity-content">
+            <div class="activity-header">
+                <span class="time-badge" style="background:#e67e22">18:30</span>
+                <span class="dur-badge">1.5h</span>
+                <h4>Umeda Sky Building — zachód słońca</h4>
+            </div>
+            <p>Futurystyczny wieżowiec z tarasem widokowym "Floating Garden" na 39. piętrze. 360° panorama Osaki o zachodzie słońca.</p>
+            <div class="activity-meta"><span class="cost-tag">~1,500 JPY</span><div class="tip">💡 Zachód słońca ok. 18:20 w kwietniu. Przyjdź 30 min wcześniej!</div></div>
+        </div>
+    </div>
+            </div>
+        </section>
+        <section id="day4" class="day-section">
+            <div class="day-header" style="background:#c45200">
+                <div class="day-number">D4</div>
+                <div class="day-info">
+                    <span class="day-date">21 kwi (pon)</span>
+                    <h2>Kyoto — Day Trip 2 (Arashiyama + Uji + Kinkaku-ji)</h2>
+                    <span class="region-badge">Kyoto</span>
+                </div>
+            </div>
+            <div class="day-content">
+                <div class="activity-card">
+        
+        <div class="activity-content">
+            <div class="activity-header">
+                <span class="time-badge" style="background:#e67e22">07:30</span>
+                <span class="dur-badge">30 min</span>
+                <h4>Wczesny pociąg do Kyoto</h4>
+            </div>
+            <p>JR do Saga-Arashiyama Station.</p>
+            <div class="activity-meta"><span class="cost-tag">~570 JPY</span></div>
+        </div>
+    </div><div class="activity-card">
+        <a href="https://lh3.googleusercontent.com/place-photos/AL8-SNEXsCIns2pOGAiSW8fVQF_nxdcdZOQEHFvWimrh0qEoqm_Ymna1Z6Aj3hGt6BpVMlYKd7pnTjdlac3IptIUINjrJLYLyWICl9WpiuyzsnbkpsaVufHioh9sD3nMCh_9-0qeByIghoiEFHnOV-U=s4800-w800-h600" target="_blank" class="activity-thumb" title="Kliknij aby zobaczyć pełne zdjęcie">
+            <img src="https://lh3.googleusercontent.com/place-photos/AL8-SNEXsCIns2pOGAiSW8fVQF_nxdcdZOQEHFvWimrh0qEoqm_Ymna1Z6Aj3hGt6BpVMlYKd7pnTjdlac3IptIUINjrJLYLyWICl9WpiuyzsnbkpsaVufHioh9sD3nMCh_9-0qeByIghoiEFHnOV-U=s400-w200-h140" alt="Arashiyama Bamboo Grove 🎋" loading="lazy"/>
+        </a>
+        <div class="activity-content">
+            <div class="activity-header">
+                <span class="time-badge" style="background:#e67e22">08:30</span>
+                <span class="dur-badge">1.5h</span>
+                <h4>Arashiyama Bamboo Grove 🎋</h4>
+            </div>
+            <p>Ikoniczny gaj bambusowy — wysokie na 20m bambusy tworzą zielony tunel. Ścieżka prowadzi do świątyni Tenryū-ji.</p>
+            <div class="activity-meta"><span class="cost-tag">Darmowe</span><div class="tip">💡 KONIECZNIE przed 9:00! Po 10:00 tłumy turystów — nie zobaczysz pustych ścieżek.</div></div>
+        </div>
+    </div><div class="activity-card">
+        <a href="https://lh3.googleusercontent.com/places/ANXAkqF0qK-eRiaS3WMmIrTq41JMOJTsCydpbrNOZRrGC74f4auD_Q1jrxIP6BrkDAw8-hHyCz-igz9OABO46zCN84Mz4N8IvwLaLYU=s4800-w800-h600" target="_blank" class="activity-thumb" title="Kliknij aby zobaczyć pełne zdjęcie">
+            <img src="https://lh3.googleusercontent.com/places/ANXAkqF0qK-eRiaS3WMmIrTq41JMOJTsCydpbrNOZRrGC74f4auD_Q1jrxIP6BrkDAw8-hHyCz-igz9OABO46zCN84Mz4N8IvwLaLYU=s400-w200-h140" alt="Pociąg do Uji + Fukujuen Tea Factory" loading="lazy"/>
+        </a>
+        <div class="activity-content">
+            <div class="activity-header">
+                <span class="time-badge" style="background:#e67e22">10:30</span>
+                <span class="dur-badge">1.5h</span>
+                <h4>Pociąg do Uji + Fukujuen Tea Factory</h4>
+            </div>
+            <p>Warsztaty mielenia matchy na kamieniu + degustacja. Uji to stolica japońskiej herbaty.</p>
+            <div class="activity-meta"><span class="cost-tag">~3,000 JPY warsztat</span><div class="tip">💡 Zarezerwuj warsztaty z wyprzedzeniem!</div></div>
+        </div>
+    </div><div class="activity-card">
+        
+        <div class="activity-content">
+            <div class="activity-header">
+                <span class="time-badge" style="background:#e67e22">13:00</span>
+                <span class="dur-badge">1h</span>
+                <h4>Lunch w Uji</h4>
+            </div>
+            <p>Matcha soba, matcha lody, matcha wszystko! Uji ma najlepszą matcha w Japonii.</p>
+            <div class="activity-meta"><span class="cost-tag">~1,500 JPY</span></div>
+        </div>
+    </div><div class="activity-card">
+        <a href="https://lh3.googleusercontent.com/place-photos/AL8-SNHltSLi52FvpvVQVYUAX0bA8Vda-DFC_5zzGYeQ228wgHtpM7MKLfuamFQynCcu_0zi0FSnMRXHDZzhBN1RAi0Cm5kJD5QGHDrMoE3dE-FJkHjh9yTFxz1ZmUBUz-gVtpdyMKoTUbk15LZLPChLzta7lg=s4800-w800-h600" target="_blank" class="activity-thumb" title="Kliknij aby zobaczyć pełne zdjęcie">
+            <img src="https://lh3.googleusercontent.com/place-photos/AL8-SNHltSLi52FvpvVQVYUAX0bA8Vda-DFC_5zzGYeQ228wgHtpM7MKLfuamFQynCcu_0zi0FSnMRXHDZzhBN1RAi0Cm5kJD5QGHDrMoE3dE-FJkHjh9yTFxz1ZmUBUz-gVtpdyMKoTUbk15LZLPChLzta7lg=s400-w200-h140" alt="Kinkaku-ji — Złoty Pawilon 🏛️" loading="lazy"/>
+        </a>
+        <div class="activity-content">
+            <div class="activity-header">
+                <span class="time-badge" style="background:#e67e22">14:30</span>
+                <span class="dur-badge">1.5h</span>
+                <h4>Kinkaku-ji — Złoty Pawilon 🏛️</h4>
+            </div>
+            <p>Najsłynniejsza świątynia Kyoto pokryta prawdziwym złotem. Odbija się idealnie w stawie lustrzanym. UNESCO World Heritage.</p>
+            <div class="activity-meta"><span class="cost-tag">~500 JPY</span><div class="tip">💡 Najlepsze zdjęcie: staw tuż za wejściem — złoto odbijające się w wodzie.</div></div>
+        </div>
+    </div><div class="activity-card">
+        
+        <div class="activity-content">
+            <div class="activity-header">
+                <span class="time-badge" style="background:#e67e22">16:30</span>
+                <span class="dur-badge">45 min</span>
+                <h4>Powrót do Osaki</h4>
+            </div>
+            <p>JR z Kyoto Station do Osaka.</p>
+            <div class="activity-meta"><span class="cost-tag">~570 JPY</span></div>
+        </div>
+    </div><div class="activity-card">
+        
+        <div class="activity-content">
+            <div class="activity-header">
+                <span class="time-badge" style="background:#e67e22">18:00</span>
+                <span class="dur-badge">2h</span>
+                <h4>Wolny wieczór w Osace</h4>
+            </div>
+            <p>Ostatni wieczór w Osace! Opcje: Shinsekai (retro dzielnica), Kuromon Market, lub ponowne odwiedziny Dotonbori.</p>
+            <div class="activity-meta"><span class="cost-tag">Wg uznania</span><div class="tip">💡 Jutro wymeldowanie — spakuj się wieczorem!</div></div>
+        </div>
+    </div>
+            </div>
+        </section>
+        <section id="day5" class="day-section">
+            <div class="day-header" style="background:#1a6b3c">
+                <div class="day-number">D5</div>
+                <div class="day-info">
+                    <span class="day-date">22 kwi (wt)</span>
+                    <h2>Osaka → Hiroshima</h2>
+                    <span class="region-badge">Hiroshima</span>
+                </div>
+            </div>
+            <div class="day-content">
+                <div class="activity-card">
+        <a href="https://lh3.googleusercontent.com/place-photos/AL8-SNEHsdCobi27W21lcWPgExM6EOnJv6cH8DsPttySTS4gurVzApiBqWh-z2iTNA_LeTQiz-dtRQ_SsKtYrOqaJEoyYnXCOjps10_gwTV4fdT8e8B0quJOmNAc5af1Qc6tCGKYcoWXGHTGS1WTGQ=s4800-w800-h600" target="_blank" class="activity-thumb" title="Kliknij aby zobaczyć pełne zdjęcie">
+            <img src="https://lh3.googleusercontent.com/place-photos/AL8-SNEHsdCobi27W21lcWPgExM6EOnJv6cH8DsPttySTS4gurVzApiBqWh-z2iTNA_LeTQiz-dtRQ_SsKtYrOqaJEoyYnXCOjps10_gwTV4fdT8e8B0quJOmNAc5af1Qc6tCGKYcoWXGHTGS1WTGQ=s400-w200-h140" alt="Osaka Aquarium Kaiyukan 🐋" loading="lazy"/>
+        </a>
+        <div class="activity-content">
+            <div class="activity-header">
+                <span class="time-badge" style="background:#27ae60">09:30</span>
+                <span class="dur-badge">2.5h</span>
+                <h4>Osaka Aquarium Kaiyukan 🐋</h4>
+            </div>
+            <p>Jedno z największych akwariów na świecie. Rekin wielorybi, manty, delfiny, pingwiny. Budynek w spiralnym układzie.</p>
+            <div class="activity-meta"><span class="cost-tag">~75 PLN</span><div class="tip">💡 Otwierane 10:00 (sob 9:00). Kup bilety online!</div></div>
+        </div>
+    </div><div class="activity-card">
+        
+        <div class="activity-content">
+            <div class="activity-header">
+                <span class="time-badge" style="background:#27ae60">12:30</span>
+                <span class="dur-badge">1.5h</span>
+                <h4>Shinkansen Osaka → Hiroshima</h4>
+            </div>
+            <p>Shinkansen Nozomi/Sakura z Shin-Osaka do Hiroshima. ~1h 20 min jazdy.</p>
+            <div class="activity-meta"><span class="cost-tag">~10,000 JPY</span></div>
+        </div>
+    </div><div class="activity-card">
+        
+        <div class="activity-content">
+            <div class="activity-header">
+                <span class="time-badge" style="background:#27ae60">14:30</span>
+                <span class="dur-badge">30 min</span>
+                <h4>Check-in: Toyoko Inn Hiroshima</h4>
+            </div>
+            <p>2 noce (22-24 kwi). Hotel przy dworcu — wygodna lokalizacja.</p>
+            <div class="activity-meta"></div>
+        </div>
+    </div><div class="activity-card">
+        <a href="https://lh3.googleusercontent.com/place-photos/AL8-SNHCUkYl8keaxxoULGRG6JbDWhEKhRGIrkC0BD8PHF2ExB_VLEb6p4y7oq_8ErlfFC5LfVGBNNdIUnB5cQVBpWNMbA9Q4C0kEbooMyu5kTGca16LQJERom8C04nts_3oLv8rIrOmwJhJDqCMAw=s4800-w800-h600" target="_blank" class="activity-thumb" title="Kliknij aby zobaczyć pełne zdjęcie">
+            <img src="https://lh3.googleusercontent.com/place-photos/AL8-SNHCUkYl8keaxxoULGRG6JbDWhEKhRGIrkC0BD8PHF2ExB_VLEb6p4y7oq_8ErlfFC5LfVGBNNdIUnB5cQVBpWNMbA9Q4C0kEbooMyu5kTGca16LQJERom8C04nts_3oLv8rIrOmwJhJDqCMAw=s400-w200-h140" alt="Peace Memorial Park + A-Bomb Dome" loading="lazy"/>
+        </a>
+        <div class="activity-content">
+            <div class="activity-header">
+                <span class="time-badge" style="background:#27ae60">15:30</span>
+                <span class="dur-badge">2h</span>
+                <h4>Peace Memorial Park + A-Bomb Dome</h4>
+            </div>
+            <p>Park pokoju z Kopułą Bomby Atomowej (UNESCO), Cenotaf, Płomień Pokoju, Dzwon Pokoju. Poruszające i refleksyjne miejsce.</p>
+            <div class="activity-meta"><span class="cost-tag">Darmowe (park)</span><div class="tip">💡 A-Bomb Dome wygląda najbardziej przejmująco o zmierzchu.</div></div>
+        </div>
+    </div><div class="activity-card">
+        
+        <div class="activity-content">
+            <div class="activity-header">
+                <span class="time-badge" style="background:#27ae60">18:00</span>
+                <span class="dur-badge">1.5h</span>
+                <h4>Hiroshima-style okonomiyaki — kolacja</h4>
+            </div>
+            <p>Hiroshima okonomiyaki jest warstwowe (nie mieszane jak w Osace): makaron, kapusta, jajko, mięso. Spróbuj w Okonomimura building.</p>
+            <div class="activity-meta"><span class="cost-tag">~1,500 JPY</span><div class="tip">💡 Okonomimura — budynek z dziesiątkami stoisk okonomiyaki!</div></div>
+        </div>
+    </div>
+            </div>
+        </section>
+        <section id="day6" class="day-section">
+            <div class="day-header" style="background:#1a6b3c">
+                <div class="day-number">D6</div>
+                <div class="day-info">
+                    <span class="day-date">23 kwi (śr)</span>
+                    <h2>Hiroshima — Pełny Dzień</h2>
+                    <span class="region-badge">Hiroshima</span>
+                </div>
+            </div>
+            <div class="day-content">
+                <div class="activity-card">
+        <a href="https://lh3.googleusercontent.com/place-photos/AL8-SNHCUkYl8keaxxoULGRG6JbDWhEKhRGIrkC0BD8PHF2ExB_VLEb6p4y7oq_8ErlfFC5LfVGBNNdIUnB5cQVBpWNMbA9Q4C0kEbooMyu5kTGca16LQJERom8C04nts_3oLv8rIrOmwJhJDqCMAw=s4800-w800-h600" target="_blank" class="activity-thumb" title="Kliknij aby zobaczyć pełne zdjęcie">
+            <img src="https://lh3.googleusercontent.com/place-photos/AL8-SNHCUkYl8keaxxoULGRG6JbDWhEKhRGIrkC0BD8PHF2ExB_VLEb6p4y7oq_8ErlfFC5LfVGBNNdIUnB5cQVBpWNMbA9Q4C0kEbooMyu5kTGca16LQJERom8C04nts_3oLv8rIrOmwJhJDqCMAw=s400-w200-h140" alt="Peace Memorial Museum 🕊️" loading="lazy"/>
+        </a>
+        <div class="activity-content">
+            <div class="activity-header">
+                <span class="time-badge" style="background:#27ae60">09:00</span>
+                <span class="dur-badge">2h</span>
+                <h4>Peace Memorial Museum 🕊️</h4>
+            </div>
+            <p>Jedno z najważniejszych muzeów na świecie. Osobiste historie ofiar, artefakty, kontekst historyczny. Głęboko poruszające doświadczenie.</p>
+            <div class="activity-meta"><span class="cost-tag">~200 JPY</span><div class="tip">💡 Zarezerwuj 2h. Bardzo emocjonalne — przygotuj się psychicznie.</div></div>
+        </div>
+    </div><div class="activity-card">
+        <a href="https://lh3.googleusercontent.com/place-photos/AL8-SNFDUv2YeDvcpeRC-a0WRUECOS0fDpexYhznJBN3ym0Veyq5IvzZ5j7VbAd4MCnSIbAyMBxZXc8sFvH8sccwOZklNox31ouVjI-WraMSxFYdrGb6QB5cRGbKYWYExtqC91pxMsRxI2KwUalb7CY=s4800-w800-h600" target="_blank" class="activity-thumb" title="Kliknij aby zobaczyć pełne zdjęcie">
+            <img src="https://lh3.googleusercontent.com/place-photos/AL8-SNFDUv2YeDvcpeRC-a0WRUECOS0fDpexYhznJBN3ym0Veyq5IvzZ5j7VbAd4MCnSIbAyMBxZXc8sFvH8sccwOZklNox31ouVjI-WraMSxFYdrGb6QB5cRGbKYWYExtqC91pxMsRxI2KwUalb7CY=s400-w200-h140" alt="Zamek Hiroshima (Zamek Karpia) 🏯" loading="lazy"/>
+        </a>
+        <div class="activity-content">
+            <div class="activity-header">
+                <span class="time-badge" style="background:#27ae60">11:30</span>
+                <span class="dur-badge">1.5h</span>
+                <h4>Zamek Hiroshima (Zamek Karpia) 🏯</h4>
+            </div>
+            <p>Odbudowany zamek z muzeum samurajskim w środku. Zbroje, miecze, historia klanu Mōri. Widok z 5. piętra na miasto.</p>
+            <div class="activity-meta"><span class="cost-tag">~370 JPY</span><div class="tip">💡 Może być zamknięty na renowację od marca 2026 — sprawdź przed wizytą!</div></div>
+        </div>
+    </div><div class="activity-card">
+        
+        <div class="activity-content">
+            <div class="activity-header">
+                <span class="time-badge" style="background:#27ae60">13:00</span>
+                <span class="dur-badge">1h</span>
+                <h4>Lunch w centrum Hiroshimy</h4>
+            </div>
+            <p>Tsukemen ramen, hiroshima tsukemen (zimny ramen) lub ponownie okonomiyaki.</p>
+            <div class="activity-meta"><span class="cost-tag">~1,200 JPY</span></div>
+        </div>
+    </div><div class="activity-card">
+        <a href="https://lh3.googleusercontent.com/place-photos/AL8-SNE3LGMxzePuJJ_73LLJf_pTeM3B66dDveSAAMK4II60SqNk60Pwaq5Yup3annyFoJBbMGMbIhmTtlYAqH2A83h9xfAOGe41V37o-A_HqXyuD2z3djAemQdRb7vSKCJmf5fqhsnLUrDezzXcKZIyE8XCjA=s4800-w800-h600" target="_blank" class="activity-thumb" title="Kliknij aby zobaczyć pełne zdjęcie">
+            <img src="https://lh3.googleusercontent.com/place-photos/AL8-SNE3LGMxzePuJJ_73LLJf_pTeM3B66dDveSAAMK4II60SqNk60Pwaq5Yup3annyFoJBbMGMbIhmTtlYAqH2A83h9xfAOGe41V37o-A_HqXyuD2z3djAemQdRb7vSKCJmf5fqhsnLUrDezzXcKZIyE8XCjA=s400-w200-h140" alt="Ogród Shukkeien 🌿" loading="lazy"/>
+        </a>
+        <div class="activity-content">
+            <div class="activity-header">
+                <span class="time-badge" style="background:#27ae60">14:30</span>
+                <span class="dur-badge">1.5h</span>
+                <h4>Ogród Shukkeien 🌿</h4>
+            </div>
+            <p>XVII-wieczny ogród miniaturowy z mostkami, stawami koi, herbaciarniami. "Skondensowany" krajobraz. Idealny na odpoczynek po muzeum.</p>
+            <div class="activity-meta"><span class="cost-tag">~260 JPY</span><div class="tip">💡 Jest tam herbaciarnia — zamów matcha z widokiem na staw.</div></div>
+        </div>
+    </div><div class="activity-card">
+        
+        <div class="activity-content">
+            <div class="activity-header">
+                <span class="time-badge" style="background:#27ae60">16:30</span>
+                <span class="dur-badge">2h</span>
+                <h4>Wolne popołudnie — eksploracja miasta</h4>
+            </div>
+            <p>Hondori Shopping Arcade (główny deptak handlowy), Hiroshima street food, lokalne sklepy. Opcjonalnie: Mitaki-dera (świątynia w lesie).</p>
+            <div class="activity-meta"><span class="cost-tag">Wg uznania</span></div>
+        </div>
+    </div>
+            </div>
+        </section>
+        <section id="day7" class="day-section">
+            <div class="day-header" style="background:#6c3082">
+                <div class="day-number">D7</div>
+                <div class="day-info">
+                    <span class="day-date">24 kwi (czw)</span>
+                    <h2>Hiroshima → Onomichi</h2>
+                    <span class="region-badge">Onomichi</span>
+                </div>
+            </div>
+            <div class="day-content">
+                <div class="activity-card">
+        
+        <div class="activity-content">
+            <div class="activity-header">
+                <span class="time-badge" style="background:#8e44ad">09:00</span>
+                <span class="dur-badge">1h</span>
+                <h4>Wolny poranek w Hiroshimie</h4>
+            </div>
+            <p>Spokojne pakowanie, śniadanie, ostatnie zakupy.</p>
+            <div class="activity-meta"></div>
+        </div>
+    </div><div class="activity-card">
+        
+        <div class="activity-content">
+            <div class="activity-header">
+                <span class="time-badge" style="background:#8e44ad">10:30</span>
+                <span class="dur-badge">1.5h</span>
+                <h4>Pociąg Hiroshima → Onomichi</h4>
+            </div>
+            <p>JR Sanyo Line do Onomichi (~1.5h, ~2,600 JPY). Malownicza trasa wzdłuż wybrzeża.</p>
+            <div class="activity-meta"><span class="cost-tag">~2,600 JPY</span></div>
+        </div>
+    </div><div class="activity-card">
+        
+        <div class="activity-content">
+            <div class="activity-header">
+                <span class="time-badge" style="background:#8e44ad">12:00</span>
+                <span class="dur-badge">30 min</span>
+                <h4>Check-in: Senkouji Sakano Rian Fuu</h4>
+            </div>
+            <p>1 noc (24-25 kwi). Klimatyczna pensjonat na zboczu góry — piękne widoki na port!</p>
+            <div class="activity-meta"></div>
+        </div>
+    </div><div class="activity-card">
+        
+        <div class="activity-content">
+            <div class="activity-header">
+                <span class="time-badge" style="background:#8e44ad">12:30</span>
+                <span class="dur-badge">45 min</span>
+                <h4>Onomichi Ramen — lunch</h4>
+            </div>
+            <p>Specjalność regionalna: ramen z płaskim makaronem i tłustym bulionem wieprzowym z boczkiem.</p>
+            <div class="activity-meta"><span class="cost-tag">~1,000 JPY</span><div class="tip">💡 Szukaj kolejki lokalnych — to najlepszy znak!</div></div>
+        </div>
+    </div><div class="activity-card">
+        
+        <div class="activity-content">
+            <div class="activity-header">
+                <span class="time-badge" style="background:#8e44ad">13:30</span>
+                <span class="dur-badge">3-4h</span>
+                <h4>Shimanami Kaido — rower 🚲</h4>
+            </div>
+            <p>Legendarny szlak rowerowy łączący wyspy Morza Wewnętrznego. Trasa częściowa: Mukaishima + Innoshima (~25 km). Mosty nad morzem, widoki na wyspy.</p>
+            <div class="activity-meta"><span class="cost-tag">~1,500 JPY wypożyczenie</span><div class="tip">💡 Pełna trasa = 70 km (cały dzień). 25 km = 3-4h z przystankami na zdjęcia.</div></div>
+        </div>
+    </div><div class="activity-card">
+        <a href="https://lh3.googleusercontent.com/place-photos/AL8-SNHetd5vsrt8KHewfof91FDqSGKV3AkJ2UOszaO0DA_1pAQc0498gkaIukS41zqwDfD3ev0P2xzDfRa-wh7JlYMBKYtHUYromiVql4C2SyECi9VP2wVQiYlOWiqGC8j5gwfi-x-L5wJF8-hzwA=s4800-w800-h600" target="_blank" class="activity-thumb" title="Kliknij aby zobaczyć pełne zdjęcie">
+            <img src="https://lh3.googleusercontent.com/place-photos/AL8-SNHetd5vsrt8KHewfof91FDqSGKV3AkJ2UOszaO0DA_1pAQc0498gkaIukS41zqwDfD3ev0P2xzDfRa-wh7JlYMBKYtHUYromiVql4C2SyECi9VP2wVQiYlOWiqGC8j5gwfi-x-L5wJF8-hzwA=s400-w200-h140" alt="Świątynia Senkō-ji + kolejka linowa" loading="lazy"/>
+        </a>
+        <div class="activity-content">
+            <div class="activity-header">
+                <span class="time-badge" style="background:#8e44ad">17:30</span>
+                <span class="dur-badge">1h</span>
+                <h4>Świątynia Senkō-ji + kolejka linowa</h4>
+            </div>
+            <p>Kolejka linowa na szczyt góry z panoramą na Onomichi, port i wyspy. Świątynia z pagodą o zachodzie słońca.</p>
+            <div class="activity-meta"><span class="cost-tag">~500 JPY kolejka</span><div class="tip">💡 Zachód słońca z wieży pagody = niezapomniany widok!</div></div>
+        </div>
+    </div><div class="activity-card">
+        
+        <div class="activity-content">
+            <div class="activity-header">
+                <span class="time-badge" style="background:#8e44ad">19:00</span>
+                <span class="dur-badge">1.5h</span>
+                <h4>Kolacja w Onomichi</h4>
+            </div>
+            <p>Ryby z Morza Wewnętrznego, tempura, sake. Spokojny wieczór w portowym miasteczku.</p>
+            <div class="activity-meta"><span class="cost-tag">~2,000 JPY</span></div>
+        </div>
+    </div>
+            </div>
+        </section>
+        <section id="day8" class="day-section">
+            <div class="day-header" style="background:#555">
+                <div class="day-number">D8</div>
+                <div class="day-info">
+                    <span class="day-date">25 kwi (pt)</span>
+                    <h2>Onomichi → Shizuoka → Tokyo</h2>
+                    <span class="region-badge">Podróż</span>
+                </div>
+            </div>
+            <div class="day-content">
+                <div class="activity-card">
+        
+        <div class="activity-content">
+            <div class="activity-header">
+                <span class="time-badge" style="background:#888">08:00</span>
+                <span class="dur-badge">20 min</span>
+                <h4>Pociąg Onomichi → Fukuyama</h4>
+            </div>
+            <p>Lokalna linia JR do stacji Shinkansen.</p>
+            <div class="activity-meta"><span class="cost-tag">~500 JPY</span></div>
+        </div>
+    </div><div class="activity-card">
+        
+        <div class="activity-content">
+            <div class="activity-header">
+                <span class="time-badge" style="background:#888">08:30</span>
+                <span class="dur-badge">2.5h</span>
+                <h4>Shinkansen Fukuyama → Shizuoka</h4>
+            </div>
+            <p>Szybki pociąg wzdłuż wybrzeża. Można zobaczyć Fuji z pociągu!</p>
+            <div class="activity-meta"><span class="cost-tag">~13,000 JPY</span></div>
+        </div>
+    </div><div class="activity-card">
+        <a href="https://lh3.googleusercontent.com/place-photos/AL8-SNHetd5vsrt8KHewfof91FDqSGKV3AkJ2UOszaO0DA_1pAQc0498gkaIukS41zqwDfD3ev0P2xzDfRa-wh7JlYMBKYtHUYromiVql4C2SyECi9VP2wVQiYlOWiqGC8j5gwfi-x-L5wJF8-hzwA=s4800-w800-h600" target="_blank" class="activity-thumb" title="Kliknij aby zobaczyć pełne zdjęcie">
+            <img src="https://lh3.googleusercontent.com/place-photos/AL8-SNHetd5vsrt8KHewfof91FDqSGKV3AkJ2UOszaO0DA_1pAQc0498gkaIukS41zqwDfD3ev0P2xzDfRa-wh7JlYMBKYtHUYromiVql4C2SyECi9VP2wVQiYlOWiqGC8j5gwfi-x-L5wJF8-hzwA=s400-w200-h140" alt="Miho no Matsubara — plaża z widokiem na Fuji 🗻" loading="lazy"/>
+        </a>
+        <div class="activity-content">
+            <div class="activity-header">
+                <span class="time-badge" style="background:#888">11:00</span>
+                <span class="dur-badge">1.5h</span>
+                <h4>Miho no Matsubara — plaża z widokiem na Fuji 🗻</h4>
+            </div>
+            <p>UNESCO World Heritage: czarna piaskowa plaża z sosnowym lasem i widokiem na Mt. Fuji. Legendarny krajobraz z ukiyo-e.</p>
+            <div class="activity-meta"><span class="cost-tag">Darmowe</span><div class="tip">💡 Fuji widoczny tylko przy czystym niebie — sprawdź prognozę!</div></div>
+        </div>
+    </div><div class="activity-card">
+        
+        <div class="activity-content">
+            <div class="activity-header">
+                <span class="time-badge" style="background:#888">13:00</span>
+                <span class="dur-badge">1h</span>
+                <h4>Opcjonalnie: Onsen (gorące źródła)</h4>
+            </div>
+            <p>Publiczne onsen w okolicy Shizuoki. Relaks przed dalszą podróżą.</p>
+            <div class="activity-meta"><span class="cost-tag">~1,000 JPY</span><div class="tip">💡 Tatuaże: kup plastry zakrywające (cover patches) w konbini!</div></div>
+        </div>
+    </div><div class="activity-card">
+        
+        <div class="activity-content">
+            <div class="activity-header">
+                <span class="time-badge" style="background:#888">14:00</span>
+                <span class="dur-badge">1h</span>
+                <h4>Shinkansen Shizuoka → Tokyo</h4>
+            </div>
+            <p>Ostatni odcinek do Tokio. Stacja Tokyo lub Shinjuku.</p>
+            <div class="activity-meta"><span class="cost-tag">~6,500 JPY</span></div>
+        </div>
+    </div><div class="activity-card">
+        
+        <div class="activity-content">
+            <div class="activity-header">
+                <span class="time-badge" style="background:#888">15:30</span>
+                <span class="dur-badge">30 min</span>
+                <h4>Check-in: Sasatsuka Fleur Tachibana</h4>
+            </div>
+            <p>5 nocy (25-30 kwi)! Baza na Tokio. Apartament hotelowy w spokojnej dzielnicy Sasazuka.</p>
+            <div class="activity-meta"></div>
+        </div>
+    </div><div class="activity-card">
+        
+        <div class="activity-content">
+            <div class="activity-header">
+                <span class="time-badge" style="background:#888">17:00</span>
+                <span class="dur-badge">2h</span>
+                <h4>Eksploracja Sasazuka</h4>
+            </div>
+            <p>Lokalna dzielnica z izakayami, małymi restauracjami i lokalnym klimatem. Idealne na pierwszy wieczór w Tokio.</p>
+            <div class="activity-meta"><span class="cost-tag">~2,000 JPY kolacja</span></div>
+        </div>
+    </div>
+            </div>
+        </section>
+        <section id="day9" class="day-section">
+            <div class="day-header" style="background:#c0392b">
+                <div class="day-number">D9</div>
+                <div class="day-info">
+                    <span class="day-date">26 kwi (sob)</span>
+                    <h2>Tokyo — Dzień Judo / Alternatywny</h2>
+                    <span class="region-badge">Tokyo</span>
+                </div>
+            </div>
+            <div class="day-content">
+                
+            <div class="split-plans">
+                <div class="plan-block plan-a">
+                    <h3 class="plan-title">🥋 PLAN A — Judo Competition</h3>
+                    <div class="activity-card">
+        
+        <div class="activity-content">
+            <div class="activity-header">
+                <span class="time-badge" style="background:#e74c3c">08:30</span>
+                <span class="dur-badge">30 min</span>
+                <h4>Przejazd na zawody</h4>
+            </div>
+            <p>Metro do hali zawodów. Sprawdź dokładną lokalizację na bilecie.</p>
+            <div class="activity-meta"><span class="cost-tag">~300 JPY metro</span></div>
+        </div>
+    </div><div class="activity-card">
+        
+        <div class="activity-content">
+            <div class="activity-header">
+                <span class="time-badge" style="background:#e74c3c">09:00</span>
+                <span class="dur-badge">8h</span>
+                <h4>Zawody Judo 🥋</h4>
+            </div>
+            <p>Całodniowe zawody judo. Eliminacje rano, repasaże i finały po południu. Intensywne emocje!</p>
+            <div class="activity-meta"><span class="cost-tag">min. 150 PLN bilet</span><div class="tip">💡 KUP BILETY DUŻO WCZEŚNIEJ! Sprawdź stronę organizatora. Weź przekąski i wodę.</div></div>
+        </div>
+    </div><div class="activity-card">
+        <a href="https://lh3.googleusercontent.com/place-photos/AL8-SNGw0AZuq0npYY7IyH4wUxvD3ywpB9ADTLM4GupY9sVBkOTlygQNFO5cvimMN6ywAw41tsIWWOi26QfJdspNHc28BMPY31U_Ya9yXy6XzQoigFJc3IPA5XZ9VRjZ0_kGd5ki1FGszWBXg_ji6w=s4800-w800-h600" target="_blank" class="activity-thumb" title="Kliknij aby zobaczyć pełne zdjęcie">
+            <img src="https://lh3.googleusercontent.com/place-photos/AL8-SNGw0AZuq0npYY7IyH4wUxvD3ywpB9ADTLM4GupY9sVBkOTlygQNFO5cvimMN6ywAw41tsIWWOi26QfJdspNHc28BMPY31U_Ya9yXy6XzQoigFJc3IPA5XZ9VRjZ0_kGd5ki1FGszWBXg_ji6w=s400-w200-h140" alt="Shibuya Crossing 🚶" loading="lazy"/>
+        </a>
+        <div class="activity-content">
+            <div class="activity-header">
+                <span class="time-badge" style="background:#e74c3c">18:00</span>
+                <span class="dur-badge">1h</span>
+                <h4>Shibuya Crossing 🚶</h4>
+            </div>
+            <p>Najsłynniejsze skrzyżowanie świata. Tysiące ludzi krzyżujących się we wszystkich kierunkach. Najlepiej wieczorem!</p>
+            <div class="activity-meta"><span class="cost-tag">Darmowe</span><div class="tip">💡 Najlepszy widok z Starbucks Q-FRONT lub kładki nad stacją.</div></div>
+        </div>
+    </div><div class="activity-card">
+        
+        <div class="activity-content">
+            <div class="activity-header">
+                <span class="time-badge" style="background:#e74c3c">19:00</span>
+                <span class="dur-badge">1.5h</span>
+                <h4>Kolacja w Shibuya</h4>
+            </div>
+            <p>Shibuya ma setki restauracji — ramen, yakitori, sushi. Opcja: karaoke na deser (~2,000 JPY).</p>
+            <div class="activity-meta"><span class="cost-tag">~2,000 JPY</span></div>
+        </div>
+    </div>
+                </div>
+                <div class="plan-block plan-b">
+                    <h3 class="plan-title">🗼 PLAN B — Tokyo bez Judo</h3>
+                    <div class="activity-card">
+        <a href="https://lh3.googleusercontent.com/place-photos/AL8-SNHltSLi52FvpvVQVYUAX0bA8Vda-DFC_5zzGYeQ228wgHtpM7MKLfuamFQynCcu_0zi0FSnMRXHDZzhBN1RAi0Cm5kJD5QGHDrMoE3dE-FJkHjh9yTFxz1ZmUBUz-gVtpdyMKoTUbk15LZLPChLzta7lg=s4800-w800-h600" target="_blank" class="activity-thumb" title="Kliknij aby zobaczyć pełne zdjęcie">
+            <img src="https://lh3.googleusercontent.com/place-photos/AL8-SNHltSLi52FvpvVQVYUAX0bA8Vda-DFC_5zzGYeQ228wgHtpM7MKLfuamFQynCcu_0zi0FSnMRXHDZzhBN1RAi0Cm5kJD5QGHDrMoE3dE-FJkHjh9yTFxz1ZmUBUz-gVtpdyMKoTUbk15LZLPChLzta7lg=s400-w200-h140" alt="Meiji Shrine ⛩️" loading="lazy"/>
+        </a>
+        <div class="activity-content">
+            <div class="activity-header">
+                <span class="time-badge" style="background:#e74c3c">09:00</span>
+                <span class="dur-badge">1.5h</span>
+                <h4>Meiji Shrine ⛩️</h4>
+            </div>
+            <p>Główna świątynia Tokio w sercu lasu. 100-letnie drzewa, spokój i duchowość w centrum metropolii.</p>
+            <div class="activity-meta"><span class="cost-tag">Darmowe</span><div class="tip">💡 Wejście od strony Harajuku Station — aleją z torii.</div></div>
+        </div>
+    </div><div class="activity-card">
+        
+        <div class="activity-content">
+            <div class="activity-header">
+                <span class="time-badge" style="background:#e74c3c">10:30</span>
+                <span class="dur-badge">1.5h</span>
+                <h4>Harajuku & Takeshita Street 🛍️</h4>
+            </div>
+            <p>Najbardziej kolorowa ulica Tokio. Moda uliczna, crepes, gadżety, cosplay. Centrum kultury młodzieżowej.</p>
+            <div class="activity-meta"><span class="cost-tag">Wg zakupów</span><div class="tip">💡 Sobota = tłoczno ale najlepsza atmosfera!</div></div>
+        </div>
+    </div><div class="activity-card">
+        <a href="https://lh3.googleusercontent.com/place-photos/AL8-SNGcw4qudhN1iTBwBxHOLuPmf6g6_z2L26F_im6SE-oXa6FWxuVwUwKj_Y9tpdMSYp3gm8btifD1SVOkiLC17KICDQidy_ghZV9lUpiViJeYkD78UThlA-Cu88SrMD5_2I9XBE_7gIB4pKwNhg=s4800-w800-h600" target="_blank" class="activity-thumb" title="Kliknij aby zobaczyć pełne zdjęcie">
+            <img src="https://lh3.googleusercontent.com/place-photos/AL8-SNGcw4qudhN1iTBwBxHOLuPmf6g6_z2L26F_im6SE-oXa6FWxuVwUwKj_Y9tpdMSYp3gm8btifD1SVOkiLC17KICDQidy_ghZV9lUpiViJeYkD78UThlA-Cu88SrMD5_2I9XBE_7gIB4pKwNhg=s400-w200-h140" alt="Tsukiji Outer Market 🐟" loading="lazy"/>
+        </a>
+        <div class="activity-content">
+            <div class="activity-header">
+                <span class="time-badge" style="background:#e74c3c">12:30</span>
+                <span class="dur-badge">2h</span>
+                <h4>Tsukiji Outer Market 🐟</h4>
+            </div>
+            <p>Legendarny targ rybny. Świeże sushi, maguro (tuńczyk), grillowane przegrzebki, tamagoyaki. Raj dla smakoszy.</p>
+            <div class="activity-meta"><span class="cost-tag">~2,000 JPY</span><div class="tip">💡 Gotówka! Wiele stoisk nie przyjmuje kart. Jest bankomat w środku.</div></div>
+        </div>
+    </div><div class="activity-card">
+        
+        <div class="activity-content">
+            <div class="activity-header">
+                <span class="time-badge" style="background:#e74c3c">15:00</span>
+                <span class="dur-badge">1.5h</span>
+                <h4>Ginza — ekskluzywny shopping</h4>
+            </div>
+            <p>Najbardziej prestiżowa dzielnica handlowa Tokio. Flagowe sklepy, galerie, architektura.</p>
+            <div class="activity-meta"><span class="cost-tag">Wg zakupów</span></div>
+        </div>
+    </div><div class="activity-card">
+        <a href="https://lh3.googleusercontent.com/place-photos/AL8-SNGw0AZuq0npYY7IyH4wUxvD3ywpB9ADTLM4GupY9sVBkOTlygQNFO5cvimMN6ywAw41tsIWWOi26QfJdspNHc28BMPY31U_Ya9yXy6XzQoigFJc3IPA5XZ9VRjZ0_kGd5ki1FGszWBXg_ji6w=s4800-w800-h600" target="_blank" class="activity-thumb" title="Kliknij aby zobaczyć pełne zdjęcie">
+            <img src="https://lh3.googleusercontent.com/place-photos/AL8-SNGw0AZuq0npYY7IyH4wUxvD3ywpB9ADTLM4GupY9sVBkOTlygQNFO5cvimMN6ywAw41tsIWWOi26QfJdspNHc28BMPY31U_Ya9yXy6XzQoigFJc3IPA5XZ9VRjZ0_kGd5ki1FGszWBXg_ji6w=s400-w200-h140" alt="Shibuya Crossing 🚶" loading="lazy"/>
+        </a>
+        <div class="activity-content">
+            <div class="activity-header">
+                <span class="time-badge" style="background:#e74c3c">17:00</span>
+                <span class="dur-badge">1h</span>
+                <h4>Shibuya Crossing 🚶</h4>
+            </div>
+            <p>Najsłynniejsze skrzyżowanie świata wieczorem — pełnia neonów i tłumów.</p>
+            <div class="activity-meta"><span class="cost-tag">Darmowe</span></div>
+        </div>
+    </div><div class="activity-card">
+        
+        <div class="activity-content">
+            <div class="activity-header">
+                <span class="time-badge" style="background:#e74c3c">19:00</span>
+                <span class="dur-badge">1.5h</span>
+                <h4>Kolacja + opcjonalnie karaoke</h4>
+            </div>
+            <p>Kolacja w Shibuya, a potem japońskie karaoke w prywatnych pokojach!</p>
+            <div class="activity-meta"><span class="cost-tag">~3,000 JPY</span></div>
+        </div>
+    </div>
+                </div>
+            </div>
+            </div>
+        </section>
+        <section id="day10" class="day-section">
+            <div class="day-header" style="background:#c0392b">
+                <div class="day-number">D10</div>
+                <div class="day-info">
+                    <span class="day-date">27 kwi (ndz)</span>
+                    <h2>Tokyo — Digital Art + Anime</h2>
+                    <span class="region-badge">Tokyo</span>
+                </div>
+            </div>
+            <div class="day-content">
+                <div class="activity-card">
+        <a href="https://lh3.googleusercontent.com/place-photos/AL8-SNH-50eqOMPRK6auI1TgFmN4BsY4VS5gegkWeKN9xYdaAM3IqKzcfVrtdVgGUP-A1ox3KI9y4MAocLNle5B5p5Igd0FHGlj1kI5iSYzDo7YdQHl9-9PS5GvExyzLKOFzCN9Y6lRvfQ8eR4y_Qg=s4800-w800-h600" target="_blank" class="activity-thumb" title="Kliknij aby zobaczyć pełne zdjęcie">
+            <img src="https://lh3.googleusercontent.com/place-photos/AL8-SNH-50eqOMPRK6auI1TgFmN4BsY4VS5gegkWeKN9xYdaAM3IqKzcfVrtdVgGUP-A1ox3KI9y4MAocLNle5B5p5Igd0FHGlj1kI5iSYzDo7YdQHl9-9PS5GvExyzLKOFzCN9Y6lRvfQ8eR4y_Qg=s400-w200-h140" alt="teamLab Borderless 🎨" loading="lazy"/>
+        </a>
+        <div class="activity-content">
+            <div class="activity-header">
+                <span class="time-badge" style="background:#e74c3c">10:00</span>
+                <span class="dur-badge">3h</span>
+                <h4>teamLab Borderless 🎨</h4>
+            </div>
+            <p>Najsłynniejsze muzeum sztuki cyfrowej na świecie. Immersyjne pokoje, projekcje, kwiaty, wodospady z pikseli. Brak ustalonej ścieżki — eksploruj!</p>
+            <div class="activity-meta"><span class="cost-tag">~150 PLN</span><div class="tip">💡 ZAREZERWUJ 2 MIESIĄCE WCZEŚNIEJ! Bilety wyprzedają się szybko. Ubierz się na biało — kolory lepiej się odbijają.</div></div>
+        </div>
+    </div><div class="activity-card">
+        
+        <div class="activity-content">
+            <div class="activity-header">
+                <span class="time-badge" style="background:#e74c3c">13:30</span>
+                <span class="dur-badge">1h</span>
+                <h4>Lunch</h4>
+            </div>
+            <p>Azabudai Hills (przy teamLab) lub okolica — dużo opcji.</p>
+            <div class="activity-meta"><span class="cost-tag">~1,500 JPY</span></div>
+        </div>
+    </div><div class="activity-card">
+        <a href="https://lh3.googleusercontent.com/place-photos/AL8-SNEol0XxkarTyRY6NOx0gKA4ebbXfX24Z2UyLw0vEOLhV-t7KgPeUVp9h1LUtfxmoXgrcgxnl5_Z5mq9LOTpjk9x6Ys19j0cyItjRfS5xr-V-eeddc1SfGFtHytHvdKwGTr-jOSxsJf5pIqq=s4800-w800-h600" target="_blank" class="activity-thumb" title="Kliknij aby zobaczyć pełne zdjęcie">
+            <img src="https://lh3.googleusercontent.com/place-photos/AL8-SNEol0XxkarTyRY6NOx0gKA4ebbXfX24Z2UyLw0vEOLhV-t7KgPeUVp9h1LUtfxmoXgrcgxnl5_Z5mq9LOTpjk9x6Ys19j0cyItjRfS5xr-V-eeddc1SfGFtHytHvdKwGTr-jOSxsJf5pIqq=s400-w200-h140" alt="Akihabara — anime & gaming district 🎮" loading="lazy"/>
+        </a>
+        <div class="activity-content">
+            <div class="activity-header">
+                <span class="time-badge" style="background:#e74c3c">14:30</span>
+                <span class="dur-badge">2.5h</span>
+                <h4>Akihabara — anime & gaming district 🎮</h4>
+            </div>
+            <p>Mekka otaku: Mandarake (manga/anime sklep 8 pięter), arcade games, maid cafés, figurki, elektronika.</p>
+            <div class="activity-meta"><span class="cost-tag">Wg zakupów</span><div class="tip">💡 Mandarake + Radio Kaikan to must-visit. Super Potato = retro gaming!</div></div>
+        </div>
+    </div><div class="activity-card">
+        
+        <div class="activity-content">
+            <div class="activity-header">
+                <span class="time-badge" style="background:#e74c3c">17:00</span>
+                <span class="dur-badge">1.5h</span>
+                <h4>Sailor Moon Locations 🌙</h4>
+            </div>
+            <p>Kimi-chan Statue (Azabu-Jūban), Akasaka Hikawa Shrine, Sailor Moon Store. Dla fanów anime.</p>
+            <div class="activity-meta"><span class="cost-tag">Wg zakupów</span><div class="tip">💡 Sailor Moon Store w Harajuku/Shibuya — sprawdź aktualną lokalizację.</div></div>
+        </div>
+    </div><div class="activity-card">
+        
+        <div class="activity-content">
+            <div class="activity-header">
+                <span class="time-badge" style="background:#e74c3c">19:00</span>
+                <span class="dur-badge">1.5h</span>
+                <h4>Kolacja</h4>
+            </div>
+            <p>Opcja: Robot Restaurant (Shinjuku), yakitori aleja pod torami (Yurakucho), lub izakaya.</p>
+            <div class="activity-meta"><span class="cost-tag">~2,500 JPY</span></div>
+        </div>
+    </div>
+            </div>
+        </section>
+        <section id="day11" class="day-section">
+            <div class="day-header" style="background:#c0392b">
+                <div class="day-number">D11</div>
+                <div class="day-info">
+                    <span class="day-date">28 kwi (pon)</span>
+                    <h2>Tokyo — Parki, Widoki & Vibes</h2>
+                    <span class="region-badge">Tokyo</span>
+                </div>
+            </div>
+            <div class="day-content">
+                <div class="activity-card">
+        <a href="https://lh3.googleusercontent.com/place-photos/AL8-SNGNVdT6QZ1gukFJVWUgaGXHtok7jDCZ5mLuYPnmciUvsor-u2qjAdudy50RN9nSg_AlTLP3_Nf-sDm2bbEz5R0eROL67EZoYPXkzNrFPDNPm892Tt3PkoY8efbGbHsWFLceXv5mBlQ176r65Dk=s4800-w800-h600" target="_blank" class="activity-thumb" title="Kliknij aby zobaczyć pełne zdjęcie">
+            <img src="https://lh3.googleusercontent.com/place-photos/AL8-SNGNVdT6QZ1gukFJVWUgaGXHtok7jDCZ5mLuYPnmciUvsor-u2qjAdudy50RN9nSg_AlTLP3_Nf-sDm2bbEz5R0eROL67EZoYPXkzNrFPDNPm892Tt3PkoY8efbGbHsWFLceXv5mBlQ176r65Dk=s400-w200-h140" alt="Shinjuku Gyoen 🌸" loading="lazy"/>
+        </a>
+        <div class="activity-content">
+            <div class="activity-header">
+                <span class="time-badge" style="background:#e74c3c">09:00</span>
+                <span class="dur-badge">2h</span>
+                <h4>Shinjuku Gyoen 🌸</h4>
+            </div>
+            <p>Ogromny park narodowy z ogrodem japońskim, angielskim i francuskim. Idealny na poranny spacer i odpoczynek od miasta.</p>
+            <div class="activity-meta"><span class="cost-tag">500 JPY</span><div class="tip">💡 ⚠️ Zamknięty w poniedziałki! Sprawdź czy otwarty 28 kwi (może być otwarty z powodu Golden Week).</div></div>
+        </div>
+    </div><div class="activity-card">
+        <a href="https://lh3.googleusercontent.com/place-photos/AL8-SNGXeYxGn8_JN4KXcctilJ15_oOMQWcTsVDz9J5iN6oY1VKUhgBL9SG-Is2EeY18pXQaDGPaqAUBWfwGroQm2sTSou1fhgcnNWdXhIhWO-Kjck6Um0YC7Nc8xeSzUq5Cw3iFdZIDmf6zEq3P3Jc=s4800-w800-h600" target="_blank" class="activity-thumb" title="Kliknij aby zobaczyć pełne zdjęcie">
+            <img src="https://lh3.googleusercontent.com/place-photos/AL8-SNGXeYxGn8_JN4KXcctilJ15_oOMQWcTsVDz9J5iN6oY1VKUhgBL9SG-Is2EeY18pXQaDGPaqAUBWfwGroQm2sTSou1fhgcnNWdXhIhWO-Kjck6Um0YC7Nc8xeSzUq5Cw3iFdZIDmf6zEq3P3Jc=s400-w200-h140" alt="Tokyo Metropolitan Gov Building 🏙️" loading="lazy"/>
+        </a>
+        <div class="activity-content">
+            <div class="activity-header">
+                <span class="time-badge" style="background:#e74c3c">11:00</span>
+                <span class="dur-badge">1h</span>
+                <h4>Tokyo Metropolitan Gov Building 🏙️</h4>
+            </div>
+            <p>DARMOWY taras widokowy na 45. piętrze! Panorama Tokio, a przy czystym niebie nawet Mt. Fuji.</p>
+            <div class="activity-meta"><span class="cost-tag">DARMOWE!</span><div class="tip">💡 Zamknięty w poniedziałki! Ale przy Golden Week może być otwarty — sprawdź.</div></div>
+        </div>
+    </div><div class="activity-card">
+        
+        <div class="activity-content">
+            <div class="activity-header">
+                <span class="time-badge" style="background:#e74c3c">12:00</span>
+                <span class="dur-badge">1h</span>
+                <h4>Lunch Shinjuku</h4>
+            </div>
+            <p>Omoide Yokocho ("Memory Lane") — wąska alejka z yakitori i ramenem. Klimat retro-Tokio.</p>
+            <div class="activity-meta"><span class="cost-tag">~1,500 JPY</span></div>
+        </div>
+    </div><div class="activity-card">
+        
+        <div class="activity-content">
+            <div class="activity-header">
+                <span class="time-badge" style="background:#e74c3c">13:30</span>
+                <span class="dur-badge">1.5h</span>
+                <h4>Capybara Café 🐹</h4>
+            </div>
+            <p>Kawiarnia z kapibarami! Głaskanie, karmienie, zdjęcia z tymi uroczymi zwierzakami.</p>
+            <div class="activity-meta"><span class="cost-tag">~2,000 JPY</span><div class="tip">💡 Zarezerwuj z wyprzedzeniem — popularne miejsce!</div></div>
+        </div>
+    </div><div class="activity-card">
+        
+        <div class="activity-content">
+            <div class="activity-header">
+                <span class="time-badge" style="background:#e74c3c">15:30</span>
+                <span class="dur-badge">2h</span>
+                <h4>Lokacje z filmu "Perfect Days" 🎬</h4>
+            </div>
+            <p>Shimokitazawa: used bookshops, winylowe sklepy, vintage fashion. Klimatyczna dzielnica z filmu Wima Wendersa.</p>
+            <div class="activity-meta"><span class="cost-tag">Wg zakupów</span><div class="tip">💡 Film "Perfect Days" (2023) — obejrzyj przed wyjazdem!</div></div>
+        </div>
+    </div><div class="activity-card">
+        
+        <div class="activity-content">
+            <div class="activity-header">
+                <span class="time-badge" style="background:#e74c3c">17:30</span>
+                <span class="dur-badge">1.5h</span>
+                <h4>Cosmetics Shopping 💄</h4>
+            </div>
+            <p>Harajuku/Omotesando: japońskie kosmetyki, skincare (Shiseido, SK-II, Canmake). Don Quijote = tanio!</p>
+            <div class="activity-meta"><span class="cost-tag">Wg zakupów</span></div>
+        </div>
+    </div><div class="activity-card">
+        
+        <div class="activity-content">
+            <div class="activity-header">
+                <span class="time-badge" style="background:#e74c3c">19:00</span>
+                <span class="dur-badge">1.5h</span>
+                <h4>Kolacja</h4>
+            </div>
+            <p>Omotesando/Shibuya area — dużo opcji od casual po upscale.</p>
+            <div class="activity-meta"><span class="cost-tag">~2,500 JPY</span></div>
+        </div>
+    </div>
+            </div>
+        </section>
+        <section id="day12" class="day-section">
+            <div class="day-header" style="background:#c0392b">
+                <div class="day-number">D12</div>
+                <div class="day-info">
+                    <span class="day-date">29 kwi (wt)</span>
+                    <h2>Fuji / Flex Day</h2>
+                    <span class="region-badge">Tokyo</span>
+                </div>
+            </div>
+            <div class="day-content">
+                <div class="activity-card">
+        
+        <div class="activity-content">
+            <div class="activity-header">
+                <span class="time-badge" style="background:#e74c3c">Cały dzień</span>
+                <span class="dur-badge">8-10h</span>
+                <h4>⚠️ UWAGA: Shōwa Day (Golden Week)!</h4>
+            </div>
+            <p>29 kwietnia to święto — spodziewaj się TŁUMÓW wszędzie!</p>
+            <div class="activity-meta"><div class="tip">💡 Golden Week = najgorętszy okres podróżniczy w Japonii!</div></div>
+        </div>
+    </div><div class="activity-card">
+        
+        <div class="activity-content">
+            <div class="activity-header">
+                <span class="time-badge" style="background:#e74c3c">Opcja A</span>
+                <span class="dur-badge">8-10h</span>
+                <h4>🗻 Day trip: Mt. Fuji Area</h4>
+            </div>
+            <p>Jezioro Kawaguchi, Chureito Pagoda (ikoniczny widok Fuji z pagodą), Fuji Five Lakes. ~150 km od Tokio.</p>
+            <div class="activity-meta"><span class="cost-tag">~5,000 JPY transport</span><div class="tip">💡 Autobus z Shinjuku Station (2h). Sprawdź pogodę — Fuji nie zawsze widoczny!</div></div>
+        </div>
+    </div><div class="activity-card">
+        
+        <div class="activity-content">
+            <div class="activity-header">
+                <span class="time-badge" style="background:#e74c3c">Opcja B</span>
+                <span class="dur-badge">Cały dzień</span>
+                <h4>🏙️ Flex Day w Tokio</h4>
+            </div>
+            <p>Zakupy omiyage (prezenty), odwiedzenie pominiętych miejsc, capsule hotel experience, kabuki/teatr, cooking workshop.</p>
+            <div class="activity-meta"><span class="cost-tag">Wg uznania</span></div>
+        </div>
+    </div><div class="activity-card">
+        
+        <div class="activity-content">
+            <div class="activity-header">
+                <span class="time-badge" style="background:#e74c3c">19:00</span>
+                <span class="dur-badge">2h</span>
+                <h4>🥂 Farewell Dinner</h4>
+            </div>
+            <p>Ostatnia kolacja w Japonii! Wybierz coś wyjątkowego: omakase sushi, wagyu yakiniku, lub kaiseki.</p>
+            <div class="activity-meta"><span class="cost-tag">5,000-15,000 JPY</span><div class="tip">💡 Zarezerwuj restaurację z wyprzedzeniem!</div></div>
+        </div>
+    </div>
+            </div>
+        </section>
+        <section id="day13" class="day-section">
+            <div class="day-header" style="background:#555">
+                <div class="day-number">D13</div>
+                <div class="day-info">
+                    <span class="day-date">30 kwi (śr)</span>
+                    <h2>Wylot z Tokio ✈️</h2>
+                    <span class="region-badge">Wylot</span>
+                </div>
+            </div>
+            <div class="day-content">
+                <div class="activity-card">
+        
+        <div class="activity-content">
+            <div class="activity-header">
+                <span class="time-badge" style="background:#888">Rano</span>
+                <span class="dur-badge">1-2h</span>
+                <h4>Ostatnie zakupy omiyage</h4>
+            </div>
+            <p>Tokyo Station Character Street + Daimaru depato basement (depachika) = raj pamiątek i słodyczy.</p>
+            <div class="activity-meta"><span class="cost-tag">Wg zakupów</span><div class="tip">💡 Tokyo Banana, Kit Kat z zieloną herbatą, royce chocolate = klasyczne omiyage!</div></div>
+        </div>
+    </div><div class="activity-card">
+        
+        <div class="activity-content">
+            <div class="activity-header">
+                <span class="time-badge" style="background:#888">TBC</span>
+                <span class="dur-badge">1-1.5h</span>
+                <h4>Transfer na lotnisko</h4>
+            </div>
+            <p>Narita Express (~60 min, ~3,250 JPY) lub Limousine Bus (~90 min, ~3,200 JPY) z Shinjuku.</p>
+            <div class="activity-meta"><span class="cost-tag">~3,250 JPY</span><div class="tip">💡 Narita Express = wygodniejszy. Kup bilet wcześniej!</div></div>
+        </div>
+    </div><div class="activity-card">
+        
+        <div class="activity-content">
+            <div class="activity-header">
+                <span class="time-badge" style="background:#888">TBC</span>
+                <span class="dur-badge">—</span>
+                <h4>✈️ Wylot</h4>
+            </div>
+            <p>Sayōnara, Japonia! また来ます (mata kimasu) = wrócę!</p>
+            <div class="activity-meta"></div>
+        </div>
+    </div>
+            </div>
+        </section>
+
+<footer style="text-align:center;padding:40px 20px;color:#999;font-size:13px;">
+    Wygenerowano z ❤️ przez Claude · Luty 2026 · Ceny orientacyjne
+</footer>
+</body>
+</html>
