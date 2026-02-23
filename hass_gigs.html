@@ -28,59 +28,32 @@
     .wrap {
       max-width: 920px;
       margin: 0 auto;
-      padding: 14px 14px 18px;
+      padding: 8px 10px 10px;
     }
-
-    .top {
-      display: flex;
-      align-items: baseline;
-      justify-content: space-between;
-      gap: 12px;
-      margin-bottom: 12px;
-    }
-
-    h1 {
-      margin: 0;
-      font-size: 1.08rem;
-      letter-spacing: 0.01em;
-    }
-
-    .range {
-      color: var(--muted);
-      font-size: 0.85rem;
-      text-align: right;
-    }
-
-    .hint {
-      margin: 0 0 10px;
-      color: var(--muted);
-      font-size: 0.82rem;
-    }
-
     .list {
       display: grid;
-      gap: 8px;
+      gap: 6px;
     }
 
     .item {
       background: var(--card);
       border: 1px solid var(--line);
-      border-radius: 12px;
+      border-radius: 10px;
       box-shadow: var(--shadow);
       overflow: hidden;
     }
 
     .row {
       display: grid;
-      grid-template-columns: 106px 1fr auto;
-      gap: 10px;
-      padding: 10px 12px;
+      grid-template-columns: 92px 1fr auto;
+      gap: 6px;
+      padding: 7px 8px;
       align-items: center;
     }
 
     .date {
       font-weight: 600;
-      font-size: 0.88rem;
+      font-size: 0.76rem;
       color: #cde4df;
       line-height: 1.2;
     }
@@ -91,7 +64,7 @@
 
     .artist {
       margin: 0;
-      font-size: 0.96rem;
+      font-size: 0.84rem;
       line-height: 1.2;
       white-space: nowrap;
       overflow: hidden;
@@ -99,29 +72,29 @@
     }
 
     .meta {
-      margin: 2px 0 0;
+      margin: 1px 0 0;
       color: var(--muted);
-      font-size: 0.81rem;
+      font-size: 0.72rem;
       display: inline-flex;
       align-items: center;
       gap: 6px;
     }
 
     .club-icon {
-      width: 1.15rem;
+      width: 1rem;
       text-align: center;
-      font-size: 0.92rem;
+      font-size: 0.78rem;
       filter: saturate(1.1);
     }
 
     .actions {
       display: flex;
       align-items: center;
-      gap: 8px;
+      gap: 6px;
     }
 
     .price {
-      font-size: 0.82rem;
+      font-size: 0.74rem;
       font-weight: 700;
       color: var(--good);
       white-space: nowrap;
@@ -132,11 +105,11 @@
       border: 1px solid var(--line);
       background: #182329;
       color: var(--text);
-      border-radius: 9px;
-      height: 28px;
-      min-width: 28px;
-      padding: 0 9px;
-      font-size: 0.78rem;
+      border-radius: 7px;
+      height: 23px;
+      min-width: 23px;
+      padding: 0 7px;
+      font-size: 0.7rem;
       text-decoration: none;
       display: inline-flex;
       align-items: center;
@@ -158,11 +131,11 @@
     .details {
       display: none;
       border-top: 1px dashed var(--line);
-      padding: 9px 12px 10px;
+      padding: 7px 8px 8px;
       background: #10181d;
-      font-size: 0.8rem;
+      font-size: 0.72rem;
       color: #c7d7d4;
-      line-height: 1.35;
+      line-height: 1.28;
     }
 
     .item.open .details {
@@ -170,18 +143,10 @@
     }
 
     .score {
-      margin-top: 7px;
-      font-size: 0.77rem;
+      margin-top: 5px;
+      font-size: 0.69rem;
       color: #8cc1b9;
     }
-
-    .footer {
-      margin-top: 10px;
-      font-size: 0.74rem;
-      color: #6a7571;
-      line-height: 1.3;
-    }
-
     @media (max-width: 640px) {
       .row {
         grid-template-columns: 1fr;
@@ -193,25 +158,14 @@
       }
 
       .date {
-        font-size: 0.82rem;
+        font-size: 0.74rem;
       }
     }
   </style>
 </head>
 <body>
   <div class="wrap">
-    <div class="top">
-      <h1>Koncerty w Krakowie (Klub RE, Alchemia, Kwadrat, Hype Park)</h1>
-      <div class="range" id="range"></div>
-    </div>
-
-    <p class="hint">Sortowanie: data rosnąco. Kliknij <strong>i</strong>, aby zobaczyć krótki opis.</p>
-
     <section class="list" id="list"></section>
-
-    <p class="footer">
-      Źródła: oficjalne strony klubów + serwisy biletowe. Widok obejmuje zakres najbliższych 14 dni i może wymagać odświeżenia danych przy zmianach w lineupie.
-    </p>
   </div>
 
   <script>
@@ -331,10 +285,6 @@
       hour: "2-digit",
       minute: "2-digit"
     });
-
-    document.getElementById("range").textContent =
-      `${start.toLocaleDateString("pl-PL")} - ${end.toLocaleDateString("pl-PL")}`;
-
     const visible = events
       .map((event) => ({ ...event, date: new Date(event.startsAt) }))
       .filter((event) => event.date >= start && event.date <= end)
