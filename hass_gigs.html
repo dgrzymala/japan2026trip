@@ -30,6 +30,7 @@
       margin: 0 auto;
       padding: 8px 10px 10px;
     }
+
     .list {
       display: grid;
       gap: 6px;
@@ -45,10 +46,10 @@
 
     .row {
       display: grid;
-      grid-template-columns: 92px 1fr auto;
+      grid-template-columns: 92px minmax(170px, 1fr) minmax(220px, 1.2fr) auto;
       gap: 6px;
       padding: 7px 8px;
-      align-items: center;
+      align-items: start;
     }
 
     .date {
@@ -66,9 +67,6 @@
       margin: 0;
       font-size: 0.84rem;
       line-height: 1.2;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
     }
 
     .meta {
@@ -87,6 +85,25 @@
       filter: saturate(1.1);
     }
 
+    .genre {
+      margin: 1px 0 0;
+      color: #7db2aa;
+      font-size: 0.68rem;
+      line-height: 1.15;
+    }
+
+    .side {
+      font-size: 0.7rem;
+      color: #c7d7d4;
+      line-height: 1.25;
+    }
+
+    .score {
+      margin-top: 5px;
+      font-size: 0.69rem;
+      color: #8cc1b9;
+    }
+
     .actions {
       display: flex;
       align-items: center;
@@ -100,7 +117,6 @@
       white-space: nowrap;
     }
 
-    .info-btn,
     .buy-link {
       border: 1px solid var(--line);
       background: #182329;
@@ -117,48 +133,23 @@
       cursor: pointer;
     }
 
-    .info-btn {
-      font-weight: 700;
-      color: var(--accent);
-    }
-
-    .buy-link:hover,
-    .info-btn:hover {
+    .buy-link:hover {
       border-color: var(--accent);
       background: #1b2c33;
     }
 
-    .details {
-      display: none;
-      border-top: 1px dashed var(--line);
-      padding: 7px 8px 8px;
-      background: #10181d;
-      font-size: 0.72rem;
-      color: #c7d7d4;
-      line-height: 1.28;
-    }
-
-    .item.open .details {
-      display: block;
-    }
-
-    .score {
-      margin-top: 5px;
-      font-size: 0.69rem;
-      color: #8cc1b9;
-    }
-    @media (max-width: 640px) {
+    @media (max-width: 900px) {
       .row {
         grid-template-columns: 1fr;
-        gap: 6px;
-      }
-
-      .actions {
-        justify-content: flex-start;
+        gap: 5px;
       }
 
       .date {
         font-size: 0.74rem;
+      }
+
+      .actions {
+        justify-content: flex-start;
       }
     }
   </style>
@@ -269,6 +260,19 @@
       "Hype Park": "⚡"
     };
 
+    const genreByArtist = {
+      "Body Maintenance (AU)": "post-punk",
+      "Czajka & Puchacz": "avant-pop / impro",
+      "Sneaky Jesus": "jazz / eksperymentalne",
+      "CHICO&QATOSHI": "rap",
+      "Kresy + Bujaturla + Torschlusspanik": "post-punk / art rock",
+      "Łąki Łan": "electro-funk",
+      "Brother Tour: Lion's Law, The Chisel, Ultra Sect": "oi! / punk",
+      "BUZZCOCKS - 50th Anniversary": "punk rock",
+      "Shawn James": "folk-blues / alternative",
+      "Louis Villain": "hip-hop"
+    };
+
     const today = new Date();
     const start = new Date(today.getFullYear(), today.getMonth(), today.getDate());
     const end = new Date(start);
@@ -285,6 +289,7 @@
       hour: "2-digit",
       minute: "2-digit"
     });
+
     const visible = events
       .map((event) => ({ ...event, date: new Date(event.startsAt) }))
       .filter((event) => event.date >= start && event.date <= end)
@@ -296,39 +301,33 @@
       list.innerHTML = '<div class="item"><div class="row"><p class="meta">Brak koncertów w wybranym zakresie dat.</p></div></div>';
     } else {
       list.innerHTML = visible
-        .map((event, index) => {
+        .map((event) => {
           const dateLabel = `${formatterDate.format(event.date)} ${formatterTime.format(event.date)}`;
           const score = "●".repeat(event.match) + "○".repeat(5 - event.match);
+          const genre = genreByArtist[event.artist] || "alternative";
 
           return `
-            <article class="item" id="item-${index}">
+            <article class="item">
               <div class="row">
                 <div class="date">${dateLabel}</div>
                 <div class="main">
                   <h2 class="artist">${event.artist}</h2>
                   <p class="meta"><span class="club-icon" aria-hidden="true">${clubIcons[event.club] || "🎵"}</span><span>${event.club}</span></p>
+                  <p class="genre">gatunek: ${genre}</p>
+                </div>
+                <div class="side">
+                  ${event.description}
+                  <div class="score">Dopasowanie do Last.fm: ${score}</div>
                 </div>
                 <div class="actions">
                   <span class="price">${event.price}</span>
-                  <button class="info-btn" data-id="item-${index}" aria-label="Opis">i</button>
                   <a class="buy-link" href="${event.sourceUrl}" target="_blank" rel="noopener">bilety</a>
                 </div>
-              </div>
-              <div class="details">
-                ${event.description}
-                <div class="score">Dopasowanie do Last.fm: ${score}</div>
               </div>
             </article>
           `;
         })
         .join("");
-
-      document.querySelectorAll(".info-btn").forEach((button) => {
-        button.addEventListener("click", () => {
-          const article = document.getElementById(button.dataset.id);
-          article.classList.toggle("open");
-        });
-      });
     }
   </script>
 </body>
