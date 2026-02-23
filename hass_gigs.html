@@ -6,15 +6,16 @@
   <title>Koncerty KRK - 14 dni</title>
   <style>
     :root {
-      --bg: #0a1012;
-      --card: #131c20;
-      --text: #e8f1ef;
-      --muted: #99aaa7;
-      --accent: #3ad6c9;
-      --line: #25343a;
-      --good: #7aeaa0;
-      --danger: #f59ba5;
-      --shadow: 0 10px 24px rgba(0, 0, 0, 0.35);
+      --bg: #0b1018;
+      --card: #1b2130;
+      --card-2: #171d2a;
+      --text: #e8ecf3;
+      --muted: #aab2c3;
+      --accent: #9a7bff;
+      --line: #2a3245;
+      --good: #f3c95e;
+      --danger: #ff8698;
+      --shadow: 0 12px 24px rgba(0, 0, 0, 0.33);
     }
 
     * { box-sizing: border-box; }
@@ -22,7 +23,7 @@
     body {
       margin: 0;
       font-family: "Avenir Next", "Segoe UI", sans-serif;
-      background: radial-gradient(circle at top right, #153038 0%, var(--bg) 44%);
+      background: radial-gradient(circle at top right, #121a28 0%, var(--bg) 48%);
       color: var(--text);
     }
 
@@ -33,20 +34,21 @@
     }
 
     .hidden-menu {
-      margin: 0 0 6px;
+      margin: 0 0 8px;
       border: 1px solid var(--line);
-      border-radius: 8px;
-      background: #10171b;
+      border-radius: 14px;
+      background: linear-gradient(180deg, #1b2231 0%, #171e2b 100%);
+      box-shadow: var(--shadow);
     }
 
     .hidden-menu[open] {
-      padding-bottom: 6px;
+      padding-bottom: 7px;
     }
 
     .hidden-summary {
       list-style: none;
       cursor: pointer;
-      padding: 6px 8px;
+      padding: 7px 10px;
       font-size: 0.69rem;
       color: var(--muted);
       user-select: none;
@@ -58,7 +60,7 @@
 
     .hidden-wrap {
       margin: 0;
-      padding: 0 8px;
+      padding: 0 10px;
       display: flex;
       flex-wrap: wrap;
       gap: 6px;
@@ -68,9 +70,9 @@
     }
 
     .hidden-chip {
-      border: 1px solid #3a2a2f;
-      background: #20161a;
-      color: #f5d8dc;
+      border: 1px solid #5f4a54;
+      background: #2b1f25;
+      color: #f4d8df;
       border-radius: 999px;
       padding: 3px 7px;
       display: inline-flex;
@@ -79,9 +81,9 @@
     }
 
     .unhide-btn {
-      border: 1px solid #5a3d45;
+      border: 1px solid #8f6875;
       background: transparent;
-      color: #ffd7dc;
+      color: #ffdbe1;
       border-radius: 999px;
       font-size: 0.64rem;
       line-height: 1;
@@ -91,29 +93,29 @@
 
     .list {
       display: grid;
-      gap: 6px;
+      gap: 8px;
     }
 
     .item {
-      background: var(--card);
+      background: linear-gradient(180deg, #1f2636 0%, #1a2130 100%);
       border: 1px solid var(--line);
-      border-radius: 10px;
+      border-radius: 16px;
       box-shadow: var(--shadow);
       overflow: hidden;
     }
 
     .row {
       display: grid;
-      grid-template-columns: 92px minmax(170px, 1fr) minmax(220px, 1.2fr) auto;
-      gap: 6px;
-      padding: 7px 8px;
+      grid-template-columns: 92px minmax(170px, 1fr) auto;
+      gap: 8px;
+      padding: 9px 10px;
       align-items: start;
     }
 
     .date {
       font-weight: 600;
       font-size: 0.76rem;
-      color: #cde4df;
+      color: #d6dcea;
       line-height: 1.2;
     }
 
@@ -121,10 +123,33 @@
       min-width: 0;
     }
 
-    .artist {
+    .artist-btn {
+      width: 100%;
       margin: 0;
+      padding: 0;
+      border: 0;
+      background: transparent;
+      color: var(--text);
+      text-align: left;
       font-size: 0.84rem;
       line-height: 1.2;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .artist-btn::after {
+      content: "▸";
+      font-size: 0.7rem;
+      color: var(--muted);
+      transform: translateY(-1px);
+      transition: transform 120ms ease;
+    }
+
+    .item.open .artist-btn::after {
+      transform: rotate(90deg) translateX(1px);
+      color: var(--accent);
     }
 
     .meta {
@@ -145,21 +170,29 @@
 
     .genre {
       margin: 1px 0 0;
-      color: #7db2aa;
+      color: #b5a5ef;
       font-size: 0.68rem;
       line-height: 1.15;
     }
 
-    .side {
+    .details {
+      display: none;
+      border-top: 1px dashed #33405a;
+      padding: 7px 10px 8px;
       font-size: 0.7rem;
-      color: #c7d7d4;
+      color: #d0d7e6;
       line-height: 1.25;
+      background: linear-gradient(180deg, #171e2b 0%, #141a25 100%);
+    }
+
+    .item.open .details {
+      display: block;
     }
 
     .score {
-      margin-top: 5px;
-      font-size: 0.69rem;
-      color: #8cc1b9;
+      margin-top: 4px;
+      font-size: 0.68rem;
+      color: #bca6ff;
     }
 
     .actions {
@@ -179,13 +212,13 @@
 
     .link-btn,
     .hide-btn {
-      border: 1px solid var(--line);
-      background: #182329;
+      border: 1px solid #303a50;
+      background: var(--card-2);
       color: var(--text);
-      border-radius: 7px;
-      height: 23px;
-      min-width: 23px;
-      padding: 0 7px;
+      border-radius: 10px;
+      height: 24px;
+      min-width: 24px;
+      padding: 0 8px;
       font-size: 0.68rem;
       text-decoration: none;
       display: inline-flex;
@@ -196,22 +229,23 @@
     }
 
     .link-btn:hover {
-      border-color: var(--accent);
-      background: #1b2c33;
+      border-color: #f3c95e;
+      color: #ffdf8b;
+      background: #2a2530;
     }
 
     .hide-btn {
       color: var(--danger);
-      border-color: #5a2e35;
-      background: #211419;
+      border-color: #67424c;
+      background: #261920;
     }
 
     .hide-btn:hover {
-      border-color: #b75062;
-      background: #2a171d;
+      border-color: #be6374;
+      background: #311d25;
     }
 
-    @media (max-width: 900px) {
+     (max-width: 900px) {
       .row {
         grid-template-columns: 1fr;
         gap: 5px;
@@ -353,6 +387,7 @@
     };
 
     const hiddenArtists = new Set(JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]"));
+    const openArtists = new Set();
 
     function saveHiddenArtists() {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(Array.from(hiddenArtists)));
@@ -430,23 +465,21 @@
       }
 
       list.innerHTML = visible
-        .map((event) => {
+        .map((event, index) => {
           const dateLabel = `${formatterDate.format(event.date)} ${formatterTime.format(event.date)}`;
           const score = "●".repeat(event.match) + "○".repeat(5 - event.match);
           const genre = genreByArtist[event.artist] || "alternative";
+          const itemId = `evt-${index}`;
+          const isOpen = openArtists.has(event.artist);
 
           return `
-            <article class="item">
+            <article class="item ${isOpen ? "open" : ""}" id="${itemId}">
               <div class="row">
                 <div class="date">${dateLabel}</div>
                 <div class="main">
-                  <h2 class="artist">${event.artist}</h2>
+                  <button class="artist-btn" data-artist="${event.artist}" aria-expanded="${isOpen ? "true" : "false"}">${event.artist}</button>
                   <p class="meta"><span class="club-icon" aria-hidden="true">${clubIcons[event.club] || "🎵"}</span><span>${event.club}</span></p>
                   <p class="genre">gatunek: ${genre}</p>
-                </div>
-                <div class="side">
-                  ${event.description}
-                  <div class="score">Dopasowanie do Last.fm: ${score}</div>
                 </div>
                 <div class="actions">
                   <span class="price">${event.price}</span>
@@ -456,6 +489,10 @@
                   <button class="hide-btn" data-artist="${event.artist}">ukryj</button>
                 </div>
               </div>
+              <div class="details">
+                ${event.description}
+                <div class="score">Dopasowanie do Last.fm: ${score}</div>
+              </div>
             </article>
           `;
         })
@@ -464,7 +501,20 @@
       document.querySelectorAll(".hide-btn").forEach((button) => {
         button.addEventListener("click", () => {
           hiddenArtists.add(button.dataset.artist);
+          openArtists.delete(button.dataset.artist);
           saveHiddenArtists();
+          render();
+        });
+      });
+
+      document.querySelectorAll(".artist-btn").forEach((button) => {
+        button.addEventListener("click", () => {
+          const artist = button.dataset.artist;
+          if (openArtists.has(artist)) {
+            openArtists.delete(artist);
+          } else {
+            openArtists.add(artist);
+          }
           render();
         });
       });
