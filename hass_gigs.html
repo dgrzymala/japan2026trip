@@ -1,0 +1,368 @@
+<!doctype html>
+<html lang="pl">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Koncerty KRK - 14 dni</title>
+  <style>
+    :root {
+      --bg: #0a1012;
+      --card: #131c20;
+      --text: #e8f1ef;
+      --muted: #99aaa7;
+      --accent: #3ad6c9;
+      --line: #25343a;
+      --good: #7aeaa0;
+      --shadow: 0 10px 24px rgba(0, 0, 0, 0.35);
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: "Avenir Next", "Segoe UI", sans-serif;
+      background: radial-gradient(circle at top right, #153038 0%, var(--bg) 44%);
+      color: var(--text);
+    }
+
+    .wrap {
+      max-width: 920px;
+      margin: 0 auto;
+      padding: 14px 14px 18px;
+    }
+
+    .top {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: 1.08rem;
+      letter-spacing: 0.01em;
+    }
+
+    .range {
+      color: var(--muted);
+      font-size: 0.85rem;
+      text-align: right;
+    }
+
+    .hint {
+      margin: 0 0 10px;
+      color: var(--muted);
+      font-size: 0.82rem;
+    }
+
+    .list {
+      display: grid;
+      gap: 8px;
+    }
+
+    .item {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+
+    .row {
+      display: grid;
+      grid-template-columns: 106px 1fr auto;
+      gap: 10px;
+      padding: 10px 12px;
+      align-items: center;
+    }
+
+    .date {
+      font-weight: 600;
+      font-size: 0.88rem;
+      color: #cde4df;
+      line-height: 1.2;
+    }
+
+    .main {
+      min-width: 0;
+    }
+
+    .artist {
+      margin: 0;
+      font-size: 0.96rem;
+      line-height: 1.2;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .meta {
+      margin: 2px 0 0;
+      color: var(--muted);
+      font-size: 0.81rem;
+    }
+
+    .actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .price {
+      font-size: 0.82rem;
+      font-weight: 700;
+      color: var(--good);
+      white-space: nowrap;
+    }
+
+    .info-btn,
+    .buy-link {
+      border: 1px solid var(--line);
+      background: #182329;
+      color: var(--text);
+      border-radius: 9px;
+      height: 28px;
+      min-width: 28px;
+      padding: 0 9px;
+      font-size: 0.78rem;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+    }
+
+    .info-btn {
+      font-weight: 700;
+      color: var(--accent);
+    }
+
+    .buy-link:hover,
+    .info-btn:hover {
+      border-color: var(--accent);
+      background: #1b2c33;
+    }
+
+    .details {
+      display: none;
+      border-top: 1px dashed var(--line);
+      padding: 9px 12px 10px;
+      background: #10181d;
+      font-size: 0.8rem;
+      color: #c7d7d4;
+      line-height: 1.35;
+    }
+
+    .item.open .details {
+      display: block;
+    }
+
+    .score {
+      margin-top: 7px;
+      font-size: 0.77rem;
+      color: #8cc1b9;
+    }
+
+    .footer {
+      margin-top: 10px;
+      font-size: 0.74rem;
+      color: #6a7571;
+      line-height: 1.3;
+    }
+
+    @media (max-width: 640px) {
+      .row {
+        grid-template-columns: 1fr;
+        gap: 6px;
+      }
+
+      .actions {
+        justify-content: flex-start;
+      }
+
+      .date {
+        font-size: 0.82rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="top">
+      <h1>Koncerty w Krakowie (Klub RE, Alchemia, Kwadrat, Hype Park)</h1>
+      <div class="range" id="range"></div>
+    </div>
+
+    <p class="hint">Sortowanie: data rosnąco. Kliknij <strong>i</strong>, aby zobaczyć krótki opis.</p>
+
+    <section class="list" id="list"></section>
+
+    <p class="footer">
+      Źródła: oficjalne strony klubów + serwisy biletowe. Widok obejmuje zakres najbliższych 14 dni i może wymagać odświeżenia danych przy zmianach w lineupie.
+    </p>
+  </div>
+
+  <script>
+    const events = [
+      {
+        club: "Klub RE",
+        artist: "Body Maintenance (AU)",
+        startsAt: "2026-02-25T20:00:00+01:00",
+        price: "40 zł (60 zł w dniu)",
+        description: "Australijski post-punk z energią DIY. Dobre dopasowanie do Twoich klimatów (post-punk/alt).",
+        sourceUrl: "https://web.goingapp.pl/place/1571/1/klub-re",
+        match: 5
+      },
+      {
+        club: "Klub Alchemia",
+        artist: "Czajka & Puchacz",
+        startsAt: "2026-02-26T19:30:00+01:00",
+        price: "50 zł (60 zł w dniu)",
+        description: "Avant-pop i free impro. Jeśli lubisz bardziej alternatywne, artystyczne granie, to mocny kandydat.",
+        sourceUrl: "https://alchemia.com.pl/program/czajka-puchacz-kaja-draksler-szymon-pimpon-gasiorek/",
+        match: 4
+      },
+      {
+        club: "Klub RE",
+        artist: "Sneaky Jesus",
+        startsAt: "2026-02-27T20:00:00+01:00",
+        price: "40 zł (60 zł w dniu)",
+        description: "Wrocławski kwartet na styku jazzu i eksperymentu, oparty na kolektywnej improwizacji.",
+        sourceUrl: "https://web.goingapp.pl/place/1571/1/klub-re",
+        match: 5
+      },
+      {
+        club: "Klub Kwadrat",
+        artist: "CHICO&QATOSHI",
+        startsAt: "2026-02-27T20:00:00+01:00",
+        price: "od 180 zł",
+        description: "Koncert klubowy w Kwadracie. Mniej oczywiste dopasowanie do Twojego Last.fm, ale nadal w Twoim zakresie klubów.",
+        sourceUrl: "https://klubkwadrat.pl/",
+        match: 2
+      },
+      {
+        club: "Klub RE",
+        artist: "Kresy + Bujaturla + Torschlusspanik",
+        startsAt: "2026-02-28T20:00:00+01:00",
+        price: "40 zł",
+        description: "Wieczór z post-punkiem i art-rockiem; brzmieniowo blisko części Twojej biblioteki Last.fm.",
+        sourceUrl: "https://web.goingapp.pl/place/1571/1/klub-re",
+        match: 5
+      },
+      {
+        club: "Klub Kwadrat",
+        artist: "Łąki Łan",
+        startsAt: "2026-02-28T19:00:00+01:00",
+        price: "od 119 zł",
+        description: "Energetyczny koncert live z przekrojem utworów, bardziej taneczny i festiwalowy set.",
+        sourceUrl: "https://klubkwadrat.pl/laki-lan/",
+        match: 3
+      },
+      {
+        club: "Hype Park",
+        artist: "Brother Tour: Lion's Law, The Chisel, Ultra Sect",
+        startsAt: "2026-02-28T19:00:00+01:00",
+        price: "od 99 zł",
+        description: "Jedyny polski przystanek trasy Oi!/punk. Surowe, mocne granie i intensywny live.",
+        sourceUrl: "https://www.ticketmaster.pl/event/lion-s-law-the-chisel-ultra-sect-bilety/2020119612",
+        match: 4
+      },
+      {
+        club: "Klub Kwadrat",
+        artist: "BUZZCOCKS - 50th Anniversary",
+        startsAt: "2026-03-01T20:00:00+01:00",
+        price: "od 139.99 zł",
+        description: "Klasyka brytyjskiego punk rocka. Brzmieniowo bardzo spójne z Twoim alt/post-punkowym profilem.",
+        sourceUrl: "https://klubkwadrat.pl/buzzcocks-50th-anniversary/",
+        match: 5
+      },
+      {
+        club: "Hype Park",
+        artist: "Shawn James",
+        startsAt: "2026-03-07T19:30:00+01:00",
+        price: "119-150 zł",
+        description: "Folk/blues/alternative rock z mocnym songwriterskim klimatem i dużą emocjonalnością.",
+        sourceUrl: "https://knockoutmusicstore.pl/wydarzenia/shawn-james-2",
+        match: 4
+      },
+      {
+        club: "Klub Kwadrat",
+        artist: "Louis Villain",
+        startsAt: "2026-03-07T19:00:00+01:00",
+        price: "od 80 zł",
+        description: "Koncert hip-hopowy; niższe dopasowanie do Twoich najczęstszych gatunków, ale w obrębie Twoich klubów.",
+        sourceUrl: "https://web.goingapp.pl/evt/2411108/louis-villain-krakow",
+        match: 1
+      }
+    ];
+
+    const today = new Date();
+    const start = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+    const end = new Date(start);
+    end.setDate(end.getDate() + 14);
+    end.setHours(23, 59, 59, 999);
+
+    const formatterDate = new Intl.DateTimeFormat("pl-PL", {
+      weekday: "short",
+      day: "2-digit",
+      month: "2-digit"
+    });
+
+    const formatterTime = new Intl.DateTimeFormat("pl-PL", {
+      hour: "2-digit",
+      minute: "2-digit"
+    });
+
+    document.getElementById("range").textContent =
+      `${start.toLocaleDateString("pl-PL")} - ${end.toLocaleDateString("pl-PL")}`;
+
+    const visible = events
+      .map((event) => ({ ...event, date: new Date(event.startsAt) }))
+      .filter((event) => event.date >= start && event.date <= end)
+      .sort((a, b) => a.date - b.date);
+
+    const list = document.getElementById("list");
+
+    if (!visible.length) {
+      list.innerHTML = '<div class="item"><div class="row"><p class="meta">Brak koncertów w wybranym zakresie dat.</p></div></div>';
+    } else {
+      list.innerHTML = visible
+        .map((event, index) => {
+          const dateLabel = `${formatterDate.format(event.date)} ${formatterTime.format(event.date)}`;
+          const score = "●".repeat(event.match) + "○".repeat(5 - event.match);
+
+          return `
+            <article class="item" id="item-${index}">
+              <div class="row">
+                <div class="date">${dateLabel}</div>
+                <div class="main">
+                  <h2 class="artist">${event.artist}</h2>
+                  <p class="meta">${event.club}</p>
+                </div>
+                <div class="actions">
+                  <span class="price">${event.price}</span>
+                  <button class="info-btn" data-id="item-${index}" aria-label="Opis">i</button>
+                  <a class="buy-link" href="${event.sourceUrl}" target="_blank" rel="noopener">bilety</a>
+                </div>
+              </div>
+              <div class="details">
+                ${event.description}
+                <div class="score">Dopasowanie do Last.fm: ${score}</div>
+              </div>
+            </article>
+          `;
+        })
+        .join("");
+
+      document.querySelectorAll(".info-btn").forEach((button) => {
+        button.addEventListener("click", () => {
+          const article = document.getElementById(button.dataset.id);
+          article.classList.toggle("open");
+        });
+      });
+    }
+  </script>
+</body>
+</html>
