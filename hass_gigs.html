@@ -13,6 +13,7 @@
       --accent: #3ad6c9;
       --line: #25343a;
       --good: #7aeaa0;
+      --danger: #f59ba5;
       --shadow: 0 10px 24px rgba(0, 0, 0, 0.35);
     }
 
@@ -29,6 +30,63 @@
       max-width: 920px;
       margin: 0 auto;
       padding: 8px 10px 10px;
+    }
+
+    .hidden-menu {
+      margin: 0 0 6px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #10171b;
+    }
+
+    .hidden-menu[open] {
+      padding-bottom: 6px;
+    }
+
+    .hidden-summary {
+      list-style: none;
+      cursor: pointer;
+      padding: 6px 8px;
+      font-size: 0.69rem;
+      color: var(--muted);
+      user-select: none;
+    }
+
+    .hidden-summary::-webkit-details-marker {
+      display: none;
+    }
+
+    .hidden-wrap {
+      margin: 0;
+      padding: 0 8px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      align-items: center;
+      font-size: 0.69rem;
+      color: var(--muted);
+    }
+
+    .hidden-chip {
+      border: 1px solid #3a2a2f;
+      background: #20161a;
+      color: #f5d8dc;
+      border-radius: 999px;
+      padding: 3px 7px;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .unhide-btn {
+      border: 1px solid #5a3d45;
+      background: transparent;
+      color: #ffd7dc;
+      border-radius: 999px;
+      font-size: 0.64rem;
+      line-height: 1;
+      padding: 2px 6px;
+      cursor: pointer;
     }
 
     .list {
@@ -107,7 +165,9 @@
     .actions {
       display: flex;
       align-items: center;
-      gap: 6px;
+      gap: 5px;
+      flex-wrap: wrap;
+      justify-content: flex-end;
     }
 
     .price {
@@ -117,7 +177,8 @@
       white-space: nowrap;
     }
 
-    .buy-link {
+    .link-btn,
+    .hide-btn {
       border: 1px solid var(--line);
       background: #182329;
       color: var(--text);
@@ -125,17 +186,29 @@
       height: 23px;
       min-width: 23px;
       padding: 0 7px;
-      font-size: 0.7rem;
+      font-size: 0.68rem;
       text-decoration: none;
       display: inline-flex;
       align-items: center;
       justify-content: center;
       cursor: pointer;
+      white-space: nowrap;
     }
 
-    .buy-link:hover {
+    .link-btn:hover {
       border-color: var(--accent);
       background: #1b2c33;
+    }
+
+    .hide-btn {
+      color: var(--danger);
+      border-color: #5a2e35;
+      background: #211419;
+    }
+
+    .hide-btn:hover {
+      border-color: #b75062;
+      background: #2a171d;
     }
 
     @media (max-width: 900px) {
@@ -156,10 +229,16 @@
 </head>
 <body>
   <div class="wrap">
+    <details class="hidden-menu" id="hidden-menu">
+      <summary class="hidden-summary" id="hidden-summary">Ukryte zespoły</summary>
+      <section class="hidden-wrap" id="hidden-wrap"></section>
+    </details>
     <section class="list" id="list"></section>
   </div>
 
   <script>
+    const STORAGE_KEY = "hass_gigs_hidden_artists_v1";
+
     const events = [
       {
         club: "Klub RE",
@@ -273,6 +352,20 @@
       "Louis Villain": "hip-hop"
     };
 
+    const hiddenArtists = new Set(JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]"));
+
+    function saveHiddenArtists() {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(Array.from(hiddenArtists)));
+    }
+
+    function spotifySearchUrl(artist) {
+      return `https://open.spotify.com/search/${encodeURIComponent(artist)}`;
+    }
+
+    function appleMusicSearchUrl(artist) {
+      return `https://music.apple.com/pl/search?term=${encodeURIComponent(artist)}`;
+    }
+
     const today = new Date();
     const start = new Date(today.getFullYear(), today.getMonth(), today.getDate());
     const end = new Date(start);
@@ -290,16 +383,52 @@
       minute: "2-digit"
     });
 
-    const visible = events
-      .map((event) => ({ ...event, date: new Date(event.startsAt) }))
-      .filter((event) => event.date >= start && event.date <= end)
-      .sort((a, b) => a.date - b.date);
+    function renderHiddenPanel() {
+      const hiddenMenu = document.getElementById("hidden-menu");
+      const hiddenSummary = document.getElementById("hidden-summary");
+      const hiddenWrap = document.getElementById("hidden-wrap");
+      const hidden = Array.from(hiddenArtists).sort((a, b) => a.localeCompare(b, "pl"));
 
-    const list = document.getElementById("list");
+      if (!hidden.length) {
+        hiddenMenu.open = false;
+        hiddenMenu.style.display = "none";
+        hiddenWrap.innerHTML = "";
+        return;
+      }
 
-    if (!visible.length) {
-      list.innerHTML = '<div class="item"><div class="row"><p class="meta">Brak koncertów w wybranym zakresie dat.</p></div></div>';
-    } else {
+      hiddenMenu.style.display = "block";
+      hiddenSummary.textContent = "Ukryte zespoły (" + hidden.length + ")";
+
+      hiddenWrap.innerHTML = hidden
+        .map((artist) =>
+          '<span class="hidden-chip">' + artist + '<button class="unhide-btn" data-artist="' + artist + '">przywróć</button></span>'
+        )
+        .join("");
+
+      document.querySelectorAll(".unhide-btn").forEach((button) => {
+        button.addEventListener("click", () => {
+          hiddenArtists.delete(button.dataset.artist);
+          saveHiddenArtists();
+          render();
+        });
+      });
+    }
+
+    function render() {
+      const visible = events
+        .map((event) => ({ ...event, date: new Date(event.startsAt) }))
+        .filter((event) => event.date >= start && event.date <= end)
+        .filter((event) => !hiddenArtists.has(event.artist))
+        .sort((a, b) => a.date - b.date);
+
+      const list = document.getElementById("list");
+
+      if (!visible.length) {
+        list.innerHTML = '<div class="item"><div class="row"><p class="meta">Brak koncertów w wybranym zakresie dat.</p></div></div>';
+        renderHiddenPanel();
+        return;
+      }
+
       list.innerHTML = visible
         .map((event) => {
           const dateLabel = `${formatterDate.format(event.date)} ${formatterTime.format(event.date)}`;
@@ -321,14 +450,29 @@
                 </div>
                 <div class="actions">
                   <span class="price">${event.price}</span>
-                  <a class="buy-link" href="${event.sourceUrl}" target="_blank" rel="noopener">bilety</a>
+                  <a class="link-btn" href="${spotifySearchUrl(event.artist)}" target="_blank" rel="noopener">Spotify</a>
+                  <a class="link-btn" href="${appleMusicSearchUrl(event.artist)}" target="_blank" rel="noopener">Apple</a>
+                  <a class="link-btn" href="${event.sourceUrl}" target="_blank" rel="noopener">bilety</a>
+                  <button class="hide-btn" data-artist="${event.artist}">ukryj</button>
                 </div>
               </div>
             </article>
           `;
         })
         .join("");
+
+      document.querySelectorAll(".hide-btn").forEach((button) => {
+        button.addEventListener("click", () => {
+          hiddenArtists.add(button.dataset.artist);
+          saveHiddenArtists();
+          render();
+        });
+      });
+
+      renderHiddenPanel();
     }
+
+    render();
   </script>
 </body>
 </html>
