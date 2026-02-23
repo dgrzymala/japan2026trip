@@ -102,6 +102,16 @@
       margin: 2px 0 0;
       color: var(--muted);
       font-size: 0.81rem;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .club-icon {
+      width: 1.15rem;
+      text-align: center;
+      font-size: 0.92rem;
+      filter: saturate(1.1);
     }
 
     .actions {
@@ -298,6 +308,13 @@
       }
     ];
 
+    const clubIcons = {
+      "Klub RE": "🎛️",
+      "Klub Alchemia": "🧪",
+      "Klub Kwadrat": "◼️",
+      "Hype Park": "⚡"
+    };
+
     const today = new Date();
     const start = new Date(today.getFullYear(), today.getMonth(), today.getDate());
     const end = new Date(start);
@@ -339,7 +356,7 @@
                 <div class="date">${dateLabel}</div>
                 <div class="main">
                   <h2 class="artist">${event.artist}</h2>
-                  <p class="meta">${event.club}</p>
+                  <p class="meta"><span class="club-icon" aria-hidden="true">${clubIcons[event.club] || "🎵"}</span><span>${event.club}</span></p>
                 </div>
                 <div class="actions">
                   <span class="price">${event.price}</span>
