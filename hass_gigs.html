@@ -245,18 +245,66 @@
       background: #311d25;
     }
 
-     (max-width: 900px) {
+    @media (max-width: 900px) {
+      .wrap {
+        padding: 6px 6px 8px;
+      }
+
       .row {
         grid-template-columns: 1fr;
         gap: 5px;
+        padding: 8px 8px;
       }
 
       .date {
-        font-size: 0.74rem;
+        font-size: 0.72rem;
       }
 
       .actions {
         justify-content: flex-start;
+        width: 100%;
+        gap: 4px;
+      }
+
+      .actions .price {
+        flex-basis: 100%;
+      }
+
+      .link-btn,
+      .hide-btn {
+        height: 22px;
+        min-width: 22px;
+        padding: 0 6px;
+        font-size: 0.62rem;
+      }
+    }
+
+    @media (max-width: 420px) {
+      .artist-btn {
+        font-size: 0.8rem;
+      }
+
+      .meta {
+        font-size: 0.68rem;
+      }
+
+      .genre {
+        font-size: 0.64rem;
+      }
+
+      .details {
+        padding: 6px 8px 7px;
+        font-size: 0.67rem;
+      }
+
+      .actions {
+        gap: 3px;
+      }
+
+      .link-btn,
+      .hide-btn {
+        padding: 0 5px;
+        font-size: 0.6rem;
       }
     }
   </style>
@@ -272,6 +320,7 @@
 
   <script>
     const STORAGE_KEY = "hass_gigs_hidden_artists_v1";
+    const HA_HIDDEN_ENTITY_ID = "input_text.hass_gigs_hidden_artists";
 
     const events = [
       {
@@ -386,11 +435,70 @@
       "Louis Villain": "hip-hop"
     };
 
-    const hiddenArtists = new Set(JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]"));
+    const hiddenArtists = new Set();
     const openArtists = new Set();
 
-    function saveHiddenArtists() {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(Array.from(hiddenArtists)));
+    function encodeHiddenArtists(list) {
+      return list.map((name) => encodeURIComponent(name)).join(",");
+    }
+
+    function decodeHiddenArtists(raw) {
+      if (!raw || raw === "unknown" || raw === "unavailable") return [];
+      return raw
+        .split(",")
+        .map((item) => item.trim())
+        .filter(Boolean)
+        .map((item) => {
+          try {
+            return decodeURIComponent(item);
+          } catch {
+            return item;
+          }
+        });
+    }
+
+    async function loadHiddenArtists() {
+      hiddenArtists.clear();
+
+      try {
+        const response = await fetch(`/api/states/${HA_HIDDEN_ENTITY_ID}`, {
+          method: "GET",
+          headers: { "Accept": "application/json" },
+          credentials: "same-origin"
+        });
+
+        if (response.ok) {
+          const payload = await response.json();
+          decodeHiddenArtists(payload.state).forEach((artist) => hiddenArtists.add(artist));
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(Array.from(hiddenArtists)));
+          return;
+        }
+      } catch (error) {
+        console.warn("Nie udalo sie odczytac ukrytych zespolow z HA, fallback localStorage.", error);
+      }
+
+      const local = JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]");
+      local.forEach((artist) => hiddenArtists.add(artist));
+    }
+
+    async function saveHiddenArtists() {
+      const list = Array.from(hiddenArtists);
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(list));
+
+      try {
+        const value = encodeHiddenArtists(list);
+        await fetch("/api/services/input_text/set_value", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          credentials: "same-origin",
+          body: JSON.stringify({
+            entity_id: HA_HIDDEN_ENTITY_ID,
+            value
+          })
+        });
+      } catch (error) {
+        console.warn("Nie udalo sie zapisac ukrytych zespolow do HA, zapisano lokalnie.", error);
+      }
     }
 
     function spotifySearchUrl(artist) {
@@ -443,7 +551,7 @@
       document.querySelectorAll(".unhide-btn").forEach((button) => {
         button.addEventListener("click", () => {
           hiddenArtists.delete(button.dataset.artist);
-          saveHiddenArtists();
+          void saveHiddenArtists();
           render();
         });
       });
@@ -502,7 +610,7 @@
         button.addEventListener("click", () => {
           hiddenArtists.add(button.dataset.artist);
           openArtists.delete(button.dataset.artist);
-          saveHiddenArtists();
+          void saveHiddenArtists();
           render();
         });
       });
@@ -522,7 +630,12 @@
       renderHiddenPanel();
     }
 
-    render();
+    async function init() {
+      await loadHiddenArtists();
+      render();
+    }
+
+    void init();
   </script>
 </body>
 </html>
