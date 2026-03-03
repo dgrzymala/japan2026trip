@@ -434,6 +434,20 @@
 
 <script>
 // ============================================================
+// VENUE COLORS
+// ============================================================
+const VENUE_COLORS = {
+  'Alchemia':     '#f59e0b',
+  'Klub Re':      '#60a5fa',
+  'Hype Park':    '#4ade80',
+  'Klub Kwadrat': '#e879f9',
+};
+
+function getVenueColor(venue) {
+  return VENUE_COLORS[venue] || 'var(--text-dim)';
+}
+
+// ============================================================
 // CONFIGURATION
 // ============================================================
 const CONFIG = {
@@ -781,7 +795,7 @@ function render() {
       html += `
         <div class="concert-wrapper" data-event-id="${ev.id}">
           <div class="concert-hide-bg">UKRYJ</div>
-          <div class="concert-card" data-swipe-id="${ev.id}">
+          <div class="concert-card" data-swipe-id="${ev.id}" style="border-left: 3px solid ${getVenueColor(ev.venue)};">
             <div class="card-main">
               ${photoHtml}
               <div class="card-info">
@@ -793,7 +807,7 @@ function render() {
                   <button class="hide-btn" onclick="hideArtist('${ev.id}')" title="Ukryj">✕</button>
                 </div>
                 <div class="card-bottom">
-                  <span class="venue-time">${escapeHtml(ev.venue)}${ev.time ? ' · ' + escapeHtml(ev.time) : ''}</span>
+                  <span class="venue-time"><span style="color:${getVenueColor(ev.venue)};font-weight:600;">${escapeHtml(ev.venue)}</span>${ev.time ? ' · ' + escapeHtml(ev.time) : ''}</span>
                   ${ev.genre ? `<span class="genre-tag">${escapeHtml(ev.genre)}</span>` : ''}
                   <div class="card-actions">
                     ${priceHtml}
