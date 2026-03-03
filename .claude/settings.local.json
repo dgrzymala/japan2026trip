@@ -1,0 +1,32 @@
+{
+  "permissions": {
+    "allow": [
+      "WebFetch(domain:www.klubkwadrat.pl)",
+      "WebFetch(domain:hypepark.pl)",
+      "WebFetch(domain:www.alchemia.com.pl)",
+      "WebFetch(domain:www.klubre.pl)",
+      "WebFetch(domain:goingapp.pl)",
+      "WebFetch(domain:karnet.krakow.pl)",
+      "WebFetch(domain:alchemia.com.pl)",
+      "WebFetch(domain:klubre.pl)",
+      "WebFetch(domain:karnet.krakowculture.pl)",
+      "WebFetch(domain:klubkwadrat.pl)",
+      "WebFetch(domain:www.songkick.com)",
+      "WebFetch(domain:goout.net)",
+      "WebFetch(domain:www.bandsintown.com)",
+      "WebFetch(domain:www.ebilet.pl)",
+      "mcp__Claude_Preview__preview_start",
+      "Bash(git add concerts.html cracow-concerts-newsletter.gs)",
+      "Bash(git commit:*)",
+      "Bash(git -c:*)",
+      "Bash(git remote add origin https://github.com/dgrzymala/japan2026trip.git)",
+      "Bash(git fetch origin)",
+      "Bash(git checkout -b feature/concerts-dashboard origin/main)",
+      "Bash(git cherry-pick master)",
+      "Bash(git stash)",
+      "Bash(git stash pop)",
+      "Bash(git push -u origin feature/concerts-dashboard)",
+      "Bash(gh pr:*)"
+    ]
+  }
+}
