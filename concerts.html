@@ -1,0 +1,802 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>Koncerty Kraków</title>
+  <style>
+    /* ====== CSS VARIABLES ====== */
+    :root {
+      --bg: #0d1117;
+      --bg-surface: #161b22;
+      --bg-card: #1c2333;
+      --bg-card-hover: #242d3d;
+      --bg-hide: #da3633;
+      --accent: #ff6b35;
+      --accent-dim: #cc5529;
+      --text: #e6e6e6;
+      --text-dim: #8b949e;
+      --text-muted: #484f58;
+      --border: #30363d;
+      --spotify: #1DB954;
+      --apple: #fc3c44;
+      --genre-bg: rgba(255,107,53,0.15);
+      --genre-text: #ff9966;
+      --radius: 12px;
+      --radius-sm: 8px;
+    }
+
+    /* ====== RESET & BASE ====== */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      -webkit-font-smoothing: antialiased;
+      overflow-x: hidden;
+      padding-top: 6px;
+    }
+
+    /* ====== HIDDEN ARTISTS FILTER ====== */
+    .filter-section {
+      margin: 0 8px 4px;
+    }
+
+    .filter-toggle {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      background: var(--bg-surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 5px 10px;
+      color: var(--text-dim);
+      font-size: 10px;
+      cursor: pointer;
+      width: 100%;
+      transition: background 0.2s;
+    }
+
+    .filter-toggle:hover { background: var(--bg-card); }
+
+    .filter-toggle .chevron {
+      margin-left: auto;
+      transition: transform 0.2s;
+      font-size: 9px;
+    }
+
+    .filter-toggle.open .chevron { transform: rotate(180deg); }
+
+    .filter-toggle .badge {
+      background: var(--accent);
+      color: #fff;
+      font-size: 9px;
+      font-weight: 600;
+      padding: 0 5px;
+      border-radius: 8px;
+      min-width: 15px;
+      text-align: center;
+    }
+
+    .hidden-list {
+      display: none;
+      background: var(--bg-surface);
+      border: 1px solid var(--border);
+      border-top: none;
+      border-radius: 0 0 var(--radius-sm) var(--radius-sm);
+      max-height: 180px;
+      overflow-y: auto;
+    }
+
+    .hidden-list.open { display: block; }
+
+    .hidden-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 5px 10px;
+      border-bottom: 1px solid var(--border);
+      font-size: 10px;
+    }
+
+    .hidden-item:last-child { border-bottom: none; }
+
+    .hidden-item .restore-btn {
+      background: none;
+      border: 1px solid var(--accent);
+      color: var(--accent);
+      font-size: 9px;
+      padding: 2px 7px;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .hidden-item .restore-btn:hover {
+      background: var(--accent);
+      color: #fff;
+    }
+
+    /* ====== DATE HEADERS ====== */
+    .date-header {
+      padding: 8px 10px 3px;
+      font-size: 10px;
+      font-weight: 600;
+      color: var(--accent);
+      text-transform: capitalize;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .date-header::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: var(--border);
+    }
+
+    /* ====== CONCERT CARDS ====== */
+    .concert-wrapper {
+      position: relative;
+      margin: 0 8px 5px;
+      overflow: hidden;
+      border-radius: var(--radius-sm);
+    }
+
+    .concert-hide-bg {
+      position: absolute;
+      right: 0;
+      top: 0;
+      bottom: 0;
+      width: 70px;
+      background: var(--bg-hide);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+      font-size: 10px;
+      font-weight: 600;
+      border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+    }
+
+    .concert-card {
+      position: relative;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      overflow: hidden;
+      transition: transform 0.2s ease, opacity 0.3s;
+      z-index: 1;
+    }
+
+    .concert-card.swiping { transition: none; }
+
+    .concert-card.hiding {
+      transform: translateX(-100%) !important;
+      opacity: 0;
+    }
+
+    .concert-wrapper.removed {
+      max-height: 0;
+      margin: 0 8px;
+      overflow: hidden;
+      transition: max-height 0.3s ease, margin 0.3s ease;
+    }
+
+    /* ====== CARD MAIN ROW ====== */
+    .card-main {
+      display: flex;
+      gap: 7px;
+      padding: 6px 8px;
+    }
+
+    .artist-photo {
+      width: 34px;
+      height: 34px;
+      border-radius: 5px;
+      object-fit: cover;
+      background: var(--bg-surface);
+      flex-shrink: 0;
+    }
+
+    .artist-photo.placeholder {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 15px;
+      color: var(--text-muted);
+    }
+
+    .card-info {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .artist-name-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 4px;
+    }
+
+    .artist-name {
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      line-height: 1.2;
+      transition: color 0.2s;
+      display: flex;
+      align-items: center;
+      gap: 3px;
+    }
+
+    .artist-name:hover { color: var(--accent); }
+
+    .artist-name .expand-icon {
+      font-size: 7px;
+      transition: transform 0.2s;
+      color: var(--text-dim);
+      flex-shrink: 0;
+    }
+
+    .artist-name.expanded .expand-icon { transform: rotate(180deg); }
+
+    .hide-btn {
+      background: none;
+      border: none;
+      color: var(--text-muted);
+      font-size: 13px;
+      cursor: pointer;
+      padding: 0;
+      line-height: 1;
+      transition: color 0.2s;
+      flex-shrink: 0;
+    }
+
+    .hide-btn:hover { color: var(--bg-hide); }
+
+    /* ====== CARD BOTTOM ROW (meta + actions merged) ====== */
+    .card-bottom {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      margin-top: 2px;
+      flex-wrap: nowrap;
+      overflow: hidden;
+    }
+
+    .venue-time {
+      font-size: 9px;
+      color: var(--text-dim);
+      white-space: nowrap;
+      flex-shrink: 1;
+      min-width: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .genre-tag {
+      display: inline-block;
+      background: var(--genre-bg);
+      color: var(--genre-text);
+      font-size: 8px;
+      padding: 1px 4px;
+      border-radius: 3px;
+      font-weight: 500;
+      white-space: nowrap;
+      flex-shrink: 2;
+      min-width: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .card-actions {
+      display: flex;
+      align-items: center;
+      gap: 3px;
+      margin-left: auto;
+      flex-shrink: 0;
+    }
+
+    .price-tag {
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--text);
+      white-space: nowrap;
+    }
+
+    .ticket-btn {
+      display: inline-flex;
+      align-items: center;
+      background: var(--accent);
+      color: #fff;
+      font-size: 9px;
+      font-weight: 600;
+      padding: 3px 6px;
+      border-radius: 4px;
+      text-decoration: none;
+      transition: background 0.2s;
+      border: none;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+
+    .ticket-btn:hover { background: var(--accent-dim); }
+
+    .stream-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 22px;
+      height: 22px;
+      border-radius: 4px;
+      border: none;
+      cursor: pointer;
+      transition: opacity 0.2s;
+      text-decoration: none;
+      flex-shrink: 0;
+    }
+
+    .stream-btn:hover { opacity: 0.8; }
+    .stream-btn.spotify { background: var(--spotify); }
+    .stream-btn.apple { background: var(--apple); }
+    .stream-btn svg { width: 13px; height: 13px; }
+
+    /* ====== DESCRIPTION ====== */
+    .artist-desc {
+      font-size: 11px;
+      color: var(--text-dim);
+      line-height: 1.4;
+      padding: 0 8px;
+      display: none;
+    }
+
+    .artist-desc.open {
+      display: block;
+      padding: 2px 8px 6px;
+    }
+
+    /* ====== STATES ====== */
+    .loading, .error-msg, .empty-msg {
+      text-align: center;
+      padding: 20px 16px;
+      color: var(--text-dim);
+      font-size: 12px;
+    }
+
+    .loading .spinner {
+      width: 20px;
+      height: 20px;
+      border: 2px solid var(--border);
+      border-top-color: var(--accent);
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+      margin: 0 auto 8px;
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .error-msg { color: var(--bg-hide); }
+
+    /* ====== FOOTER ====== */
+    .app-footer {
+      text-align: center;
+      padding: 8px 12px 16px;
+      font-size: 8px;
+      color: var(--text-muted);
+      line-height: 1.5;
+    }
+
+    /* ====== SCROLLBAR ====== */
+    ::-webkit-scrollbar { width: 4px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+  </style>
+</head>
+<body>
+
+<div id="app">
+  <!-- HIDDEN ARTISTS FILTER -->
+  <div class="filter-section" id="filterSection" style="display:none;">
+    <button class="filter-toggle" id="filterToggle" onclick="toggleHiddenFilter()">
+      <span>Ukryte</span>
+      <span class="badge" id="hiddenCount">0</span>
+      <span class="chevron">▼</span>
+    </button>
+    <div class="hidden-list" id="hiddenList"></div>
+  </div>
+
+  <!-- LOADING -->
+  <div class="loading" id="loading">
+    <div class="spinner"></div>
+    Ładowanie koncertów...
+  </div>
+
+  <!-- ERROR -->
+  <div class="error-msg" id="error" style="display:none;"></div>
+
+  <!-- CONCERTS -->
+  <div id="concertsContainer"></div>
+
+  <!-- EMPTY -->
+  <div class="empty-msg" id="empty" style="display:none;">
+    Brak koncertów w tym okresie.
+  </div>
+
+  <!-- FOOTER -->
+  <div class="app-footer">
+    Aktualizacja: <span id="lastUpdate">—</span> · Regenerowane co poniedziałek.
+  </div>
+</div>
+
+<script>
+// ============================================================
+// VENUE COLORS
+// ============================================================
+const VENUE_COLORS = {
+  'Alchemia':     '#f59e0b',
+  'Klub Re':      '#60a5fa',
+  'Hype Park':    '#4ade80',
+  'Klub Kwadrat': '#e879f9',
+  'Klub Baza':    '#34d399',
+  'Warsztat':     '#fb923c',
+};
+
+function getVenueColor(venue) {
+  return VENUE_COLORS[venue] || 'var(--text-dim)';
+}
+
+// ============================================================
+// CONFIGURATION
+// ============================================================
+const CONFIG = {
+  // URL do Google Apps Script Web App (doGet endpoint)
+  // Po deployu GAS wpisz tutaj URL, np.:
+  // dataUrl: 'https://script.google.com/macros/s/TWOJ_DEPLOYMENT_ID/exec',
+  dataUrl: '',
+
+  // Klucz localStorage do zapamiętywania ukrytych artystów
+  storageKey: 'cracow_concerts_hidden',
+
+  // Jeśli true, używa danych demo zamiast fetch z GAS
+  useDemoData: true,
+};
+
+// ============================================================
+// DEMO DATA (usunąć po podłączeniu GAS Web App)
+// ============================================================
+const DEMO_DATA = {
+  generated: new Date().toISOString(),
+  dateRange: {
+    from: formatISODate(new Date()),
+    to: formatISODate(addDays(new Date(), 14)),
+  },
+  events: [
+    // ── Klub Kwadrat ───────────────────────────────────────────
+    {
+      id: 'kw-1',
+      artist: 'The Rumjacks',
+      title: 'The Rumjacks + DeeCracks',
+      date: '2026-03-27',
+      time: '20:00',
+      venue: 'Klub Kwadrat',
+      genre: 'Celtic Punk / Folk Punk',
+      description: 'Australijska legenda celtic-punku, dziś rozrzucona po Belfaście, Berlinie i Bostonie. Łączą energię punka z tradycyjną muzyką irlandzką i australijską. Najnowszy album „Dead Anthems" (2025). Support: DeeCracks. Bilet ~139 zł.',
+      imageUrl: '',
+      ticketPrice: '139 zł',
+      ticketUrl: 'https://bileo.pl/wydarzenia/the-rumjacks-21027856',
+      spotifyUrl: 'https://open.spotify.com/artist/0YbsovK4O2TkJmEPFoGkzr',
+      appleMusicUrl: 'https://music.apple.com/search?term=The+Rumjacks',
+    },
+    // ── Alchemia ───────────────────────────────────────────────
+    {
+      id: 'al-1',
+      artist: 'Sir Richard Bishop',
+      title: 'Sir Richard Bishop + Artur Rumiński',
+      date: '2026-03-31',
+      time: '20:00',
+      venue: 'Alchemia',
+      genre: 'Psychedelic / Experimental Folk',
+      description: 'Sir Richard Bishop (Sun City Girls, Rangda) – jeden z najbardziej oryginalnych gitarzystów eksperymentalnych na świecie. Artur Rumiński (ARRM, Furia). Organizuje Instant Classic. Bilety: 60 zł (przedsprzedaż) / 70 zł w dniu.',
+      imageUrl: '',
+      ticketPrice: '60 zł',
+      ticketUrl: 'https://alchemia.com.pl/kategoria-produktu/bilety/',
+      spotifyUrl: 'https://open.spotify.com/search/Sir%20Richard%20Bishop',
+      appleMusicUrl: 'https://music.apple.com/search?term=Sir+Richard+Bishop',
+    },
+  ],
+};
+
+// ============================================================
+// STATE
+// ============================================================
+let allEvents = [];
+let hiddenArtists = loadHidden();
+
+// ============================================================
+// UTILITIES
+// ============================================================
+function formatISODate(d) {
+  return d.getFullYear() + '-' +
+    String(d.getMonth() + 1).padStart(2, '0') + '-' +
+    String(d.getDate()).padStart(2, '0');
+}
+
+function addDays(d, n) {
+  const r = new Date(d);
+  r.setDate(r.getDate() + n);
+  return r;
+}
+
+function formatDatePL(isoStr) {
+  const d = new Date(isoStr + 'T00:00:00');
+  const days = ['Niedziela', 'Poniedziałek', 'Wtorek', 'Środa', 'Czwartek', 'Piątek', 'Sobota'];
+  const months = ['stycznia', 'lutego', 'marca', 'kwietnia', 'maja', 'czerwca',
+    'lipca', 'sierpnia', 'września', 'października', 'listopada', 'grudnia'];
+  return days[d.getDay()] + ', ' + d.getDate() + ' ' + months[d.getMonth()];
+}
+
+function escapeHtml(t) {
+  const d = document.createElement('div');
+  d.textContent = t;
+  return d.innerHTML;
+}
+
+// ============================================================
+// LOCAL STORAGE (hidden artists)
+// ============================================================
+function loadHidden() {
+  try {
+    return new Set(JSON.parse(localStorage.getItem(CONFIG.storageKey) || '[]'));
+  } catch { return new Set(); }
+}
+
+function saveHidden() {
+  localStorage.setItem(CONFIG.storageKey, JSON.stringify([...hiddenArtists]));
+}
+
+function hideArtist(id, artistName) {
+  hiddenArtists.add(id);
+  saveHidden();
+
+  const wrapper = document.querySelector(`[data-event-id="${id}"]`);
+  if (wrapper) {
+    const card = wrapper.querySelector('.concert-card');
+    card.classList.add('hiding');
+    setTimeout(() => {
+      wrapper.classList.add('removed');
+      setTimeout(() => render(), 350);
+    }, 300);
+  } else {
+    render();
+  }
+}
+
+function restoreArtist(id) {
+  hiddenArtists.delete(id);
+  saveHidden();
+  render();
+}
+
+// ============================================================
+// HIDDEN FILTER TOGGLE
+// ============================================================
+function toggleHiddenFilter() {
+  document.getElementById('filterToggle').classList.toggle('open');
+  document.getElementById('hiddenList').classList.toggle('open');
+}
+
+// ============================================================
+// SWIPE HANDLING
+// ============================================================
+function initSwipe(card, eventId) {
+  let startX = 0;
+  let currentX = 0;
+  let swiping = false;
+  const threshold = 80;
+
+  card.addEventListener('touchstart', (e) => {
+    startX = e.touches[0].clientX;
+    currentX = startX;
+    swiping = true;
+    card.classList.add('swiping');
+  }, { passive: true });
+
+  card.addEventListener('touchmove', (e) => {
+    if (!swiping) return;
+    currentX = e.touches[0].clientX;
+    const dx = currentX - startX;
+    if (dx < 0) {
+      card.style.transform = `translateX(${Math.max(dx, -120)}px)`;
+    }
+  }, { passive: true });
+
+  card.addEventListener('touchend', () => {
+    if (!swiping) return;
+    swiping = false;
+    card.classList.remove('swiping');
+    const dx = currentX - startX;
+
+    if (dx < -threshold) {
+      hideArtist(eventId);
+    } else {
+      card.style.transform = '';
+    }
+  });
+}
+
+// ============================================================
+// RENDER
+// ============================================================
+function render() {
+  const container = document.getElementById('concertsContainer');
+  const filterSection = document.getElementById('filterSection');
+  const hiddenCountEl = document.getElementById('hiddenCount');
+  const hiddenListEl = document.getElementById('hiddenList');
+
+  // Filter visible events
+  const visible = allEvents.filter(e => !hiddenArtists.has(e.id));
+  const hidden = allEvents.filter(e => hiddenArtists.has(e.id));
+
+  // Update hidden filter section
+  if (hidden.length > 0) {
+    filterSection.style.display = '';
+    hiddenCountEl.textContent = hidden.length;
+    hiddenListEl.innerHTML = hidden.map(e => `
+      <div class="hidden-item">
+        <span>${escapeHtml(e.artist)} · ${escapeHtml(e.venue)}</span>
+        <button class="restore-btn" onclick="restoreArtist('${e.id}')">Przywróć</button>
+      </div>
+    `).join('');
+  } else {
+    filterSection.style.display = 'none';
+    const toggle = document.getElementById('filterToggle');
+    const list = document.getElementById('hiddenList');
+    toggle.classList.remove('open');
+    list.classList.remove('open');
+  }
+
+  // Show empty state if no visible events
+  document.getElementById('empty').style.display = visible.length === 0 ? '' : 'none';
+
+  if (visible.length === 0) {
+    container.innerHTML = '';
+    return;
+  }
+
+  // Group by date
+  const grouped = {};
+  for (const ev of visible) {
+    const key = ev.date;
+    if (!grouped[key]) grouped[key] = [];
+    grouped[key].push(ev);
+  }
+
+  let html = '';
+  const sortedDates = Object.keys(grouped).sort();
+
+  for (const dateKey of sortedDates) {
+    html += `<div class="date-header">${formatDatePL(dateKey)}</div>`;
+
+    for (const ev of grouped[dateKey]) {
+      const photoHtml = ev.imageUrl
+        ? `<img class="artist-photo" src="${escapeHtml(ev.imageUrl)}" alt="${escapeHtml(ev.artist)}" loading="lazy">`
+        : `<div class="artist-photo placeholder">♪</div>`;
+
+      const priceHtml = ev.ticketPrice
+        ? `<span class="price-tag">${escapeHtml(ev.ticketPrice)}</span>`
+        : '';
+
+      const ticketBtnHtml = ev.ticketUrl
+        ? `<a class="ticket-btn" href="${escapeHtml(ev.ticketUrl)}" target="_blank" rel="noopener">Bilet</a>`
+        : '';
+
+      const spotifyBtnHtml = ev.spotifyUrl
+        ? `<a class="stream-btn spotify" href="${escapeHtml(ev.spotifyUrl)}" target="_blank" rel="noopener" title="Spotify">
+            <svg viewBox="0 0 24 24" fill="white"><path d="M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.66 0 12 0zm5.521 17.34c-.24.359-.66.48-1.021.24-2.82-1.74-6.36-2.101-10.561-1.141-.418.122-.779-.179-.899-.539-.12-.421.18-.78.54-.9 4.56-1.021 8.52-.6 11.64 1.32.42.18.479.659.301 1.02zm1.44-3.3c-.301.42-.841.6-1.262.3-3.239-1.98-8.159-2.58-11.939-1.38-.479.12-1.02-.12-1.14-.6-.12-.48.12-1.021.6-1.141C9.6 9.9 15 10.561 18.72 12.84c.361.181.54.78.241 1.2zm.12-3.36C15.24 8.4 8.82 8.16 5.16 9.301c-.6.179-1.2-.181-1.38-.721-.18-.601.18-1.2.72-1.381 4.26-1.26 11.28-1.02 15.721 1.621.539.3.719 1.02.419 1.56-.299.421-1.02.599-1.559.3z"/></svg>
+          </a>`
+        : '';
+
+      const appleBtnHtml = ev.appleMusicUrl
+        ? `<a class="stream-btn apple" href="${escapeHtml(ev.appleMusicUrl)}" target="_blank" rel="noopener" title="Apple Music">
+            <svg viewBox="0 0 24 24" fill="white"><path d="M23.994 6.124a9.23 9.23 0 0 0-.24-2.19c-.317-1.31-1.062-2.31-2.18-3.043a5.022 5.022 0 0 0-1.877-.726 10.496 10.496 0 0 0-1.564-.15c-.04-.003-.083-.01-.124-.013H5.986c-.152.01-.303.017-.455.026-.747.043-1.49.123-2.193.4-1.336.53-2.3 1.452-2.865 2.78-.192.448-.292.925-.363 1.408-.056.392-.088.785-.1 1.18 0 .032-.007.062-.01.093v12.223c.01.14.017.283.027.424.05.815.154 1.624.497 2.373.65 1.42 1.738 2.353 3.234 2.802.42.127.856.187 1.293.228.555.053 1.11.06 1.667.06h11.03c.525 0 1.048-.034 1.57-.1.823-.104 1.594-.35 2.296-.81a5.046 5.046 0 0 0 1.88-2.207c.186-.42.293-.87.37-1.324.113-.675.138-1.358.137-2.04-.002-3.8 0-7.595-.003-11.393zm-6.423 3.99v5.712c0 .417-.058.827-.244 1.206-.29.59-.76.962-1.388 1.14-.35.1-.706.157-1.07.173-.95.042-1.8-.6-1.965-1.488-.18-.972.457-1.97 1.428-2.186.36-.08.73-.12 1.096-.18.376-.06.507-.222.507-.604V10.4c0-.26-.088-.373-.348-.312l-4.77 1.073c-.054.013-.107.032-.16.05-.138.06-.2.163-.2.31v7.137c0 .4-.05.796-.22 1.167-.287.628-.79 1.02-1.45 1.19-.345.088-.698.128-1.053.142-.907.037-1.748-.565-1.936-1.418-.2-1.005.422-2.023 1.41-2.26.354-.084.716-.127 1.074-.19.353-.063.49-.21.49-.566v-5.86c0-.36.076-.465.427-.548l6.19-1.394c.09-.02.18-.036.273-.04.228-.014.356.11.356.34v1.468z"/></svg>
+          </a>`
+        : '';
+
+      html += `
+        <div class="concert-wrapper" data-event-id="${ev.id}">
+          <div class="concert-hide-bg">UKRYJ</div>
+          <div class="concert-card" data-swipe-id="${ev.id}" style="border-left: 3px solid ${getVenueColor(ev.venue)};">
+            <div class="card-main">
+              ${photoHtml}
+              <div class="card-info">
+                <div class="artist-name-row">
+                  <div class="artist-name" onclick="toggleDesc(this, '${ev.id}')">
+                    ${escapeHtml(ev.artist)}
+                    <span class="expand-icon">▼</span>
+                  </div>
+                  <button class="hide-btn" onclick="hideArtist('${ev.id}')" title="Ukryj">✕</button>
+                </div>
+                <div class="card-bottom">
+                  <span class="venue-time"><span style="color:${getVenueColor(ev.venue)};font-weight:600;">${escapeHtml(ev.venue)}</span>${ev.time ? ' · ' + escapeHtml(ev.time) : ''}</span>
+                  ${ev.genre ? `<span class="genre-tag">${escapeHtml(ev.genre)}</span>` : ''}
+                  <div class="card-actions">
+                    ${priceHtml}
+                    ${ticketBtnHtml}
+                    ${spotifyBtnHtml}
+                    ${appleBtnHtml}
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="artist-desc" id="desc-${ev.id}">${escapeHtml(ev.description || '')}</div>
+          </div>
+        </div>`;
+    }
+  }
+
+  container.innerHTML = html;
+
+  // Init swipe handlers
+  document.querySelectorAll('.concert-card[data-swipe-id]').forEach(card => {
+    initSwipe(card, card.dataset.swipeId);
+  });
+}
+
+// ============================================================
+// EXPAND / COLLAPSE DESCRIPTION
+// ============================================================
+function toggleDesc(el, id) {
+  el.classList.toggle('expanded');
+  document.getElementById('desc-' + id).classList.toggle('open');
+}
+
+// ============================================================
+// DATA LOADING
+// ============================================================
+async function loadData() {
+  const loadingEl = document.getElementById('loading');
+  const errorEl = document.getElementById('error');
+
+  try {
+    let data;
+
+    if (CONFIG.useDemoData || !CONFIG.dataUrl) {
+      data = DEMO_DATA;
+    } else {
+      const resp = await fetch(CONFIG.dataUrl, { redirect: 'follow' });
+      if (!resp.ok) throw new Error('HTTP ' + resp.status);
+      data = await resp.json();
+    }
+
+    // Update last update
+    if (data.generated) {
+      const gen = new Date(data.generated);
+      document.getElementById('lastUpdate').textContent =
+        gen.toLocaleDateString('pl-PL') + ' ' + gen.toLocaleTimeString('pl-PL', { hour: '2-digit', minute: '2-digit' });
+    }
+
+    allEvents = (data.events || []).sort((a, b) => a.date.localeCompare(b.date));
+
+    loadingEl.style.display = 'none';
+    render();
+
+  } catch (err) {
+    console.error('Load error:', err);
+    loadingEl.style.display = 'none';
+    errorEl.style.display = '';
+    errorEl.textContent = 'Błąd ładowania danych: ' + err.message;
+  }
+}
+
+// ============================================================
+// INIT
+// ============================================================
+document.addEventListener('DOMContentLoaded', loadData);
+</script>
+
+</body>
+</html>
